@@ -54,6 +54,15 @@ class Ball extends THREE.Mesh {
                 clearInterval(that.ballLoop);
                 collision = true;
                 break;
+            }else{
+                let closestWall = that.angleToWallCollision();
+                if(closestWall){
+                    that.speed.set(0, 0, 0);
+                    that.speed.set(0, 0, 0);
+                    clearInterval(that.ballLoop);
+                    collision = true;
+                    break;
+                }
             }
         }
 
@@ -64,8 +73,8 @@ class Ball extends THREE.Mesh {
     }
 
     angleToWallCollision() {
-        let pX = this.position.x > 0, //Bal zit in de positieve X helft
-            pZ = this.position.z > 0 //Bal zit in de positieve Z helft
+        let pX = this.nextPosition.x > 0, //Bal zit in de positieve X helft
+            pZ = this.nextPosition.z > 0 //Bal zit in de positieve Z helft
         let directions = [];
         pX && directions.push(new THREE.Vector3(1, 0, 0));
         pZ && directions.push(new THREE.Vector3(0, 0, 1));
@@ -97,7 +106,7 @@ class Ball extends THREE.Mesh {
                 console.log(intersects);
 
                 if (intersects[0].distance < closestWall) {
-                    dir = direction
+                    dir = direction;
                     closestWall = intersects[0].distance;
                 }
             }

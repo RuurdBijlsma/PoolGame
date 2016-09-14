@@ -10,9 +10,10 @@
 //Regels toevoegen
 class Game {
     static get tps() {
-        return 120
+        return 120;
     }
     constructor(renderElement) {
+        this.laptopGraphics = true;
         this.scene = new THREE.Scene();
         this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
 
@@ -28,7 +29,10 @@ class Game {
             antialias: true
         });
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        if(this.laptopGraphics)
+            this.renderer.shadowMap.type = THREE.BasicShadowMap;
+        else
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
         this.renderer.setSize(this.renderElement.width(), this.renderElement.height());
@@ -116,11 +120,14 @@ class Game {
                 texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
                 texture.repeat.set(0.15, 0.15);
 
-                let floorMaterial = new THREE.MeshStandardMaterial({
+                let materialSettings = that.laptopGraphics?{
+                    map: texture
+                }:{
                     map: texture,
                     bumpScale: 0.01,
                     bumpMap: texture
-                });
+                };
+                let floorMaterial = new THREE.MeshStandardMaterial(materialSettings);
                 that.floorMesh = that.shapesToMesh(floorShape, 0.2, floorMaterial);
                 that.floorMesh.position.y = -.2515;
                 that.floorMesh.rotateX(-Math.PI / 2);
@@ -328,8 +335,8 @@ class Game {
         requestAnimationFrame(function() {
             that.render(that);
         });
-        for (let ball of that.balls) {
-            ball.cubeCamera.update(that.renderer, that.scene);
-        }
+        if(!that.laptopGraphics)
+            for (let ball of that.balls)
+                ball.cubeCamera.update(that.renderer, that.scene);
     }
 }
