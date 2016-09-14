@@ -21,40 +21,46 @@ class Ball extends THREE.Mesh {
         this.speed = new THREE.Vector3();
         this.rollFriction = 1;
         this.getOtherBalls = () => game.balls.filter((ball) => ball !== this);
+        this.otherBalls = false;
         this.game = game;
     }
     setSpeed(speed) {
-        this.otherBalls = this.getOtherBalls();
+        if(!this.otherBalls)
+            this.otherBalls = this.getOtherBalls();
         let that = this;
         this.speed = speed;
         if (this.ballLoop)
-            clearInterval(this.ballLoop);
+            game.removeLoop(this.ballLoop);
         this.nextPosition = this.position.clone().addVectors(this.speed, this.position);
-        this.ballLoop = self.setInterval(function() {
+        this.ballLoop = game.addLoop(function() {
             that.moveBall(that);
-        }, 1000 / Game.tps);
+        });
     }
     moveBall(that) {
         that.speed.multiplyScalar(1 - that.rollFriction / Game.tps);
         let stopThreshold = 0.001;
         if (Math.abs(that.speed.x) < stopThreshold && Math.abs(that.speed.y) < stopThreshold && Math.abs(that.speed.z) < stopThreshold) {
             that.speed.set(0, 0, 0);
-            clearInterval(that.ballLoop);
+            game.removeLoop(that.ballLoop);
         }
         that.currentPosition = that.nextPosition.clone();
 
         let collision = that.willCollide();
 
         if(collision){
-            console.log('collision');
             let direction = collision.direction,
-                type = collision.type;
+                type = collision.type,
+                hitBall = collision.ball;
 
             direction.reflect(direction);
-            let speed = that.speed.clone();
+            let speed = that.speed;
 
             let outgoingVector=((d, n) => d.sub(n.multiplyScalar(d.dot(n)*2))),
-                outgoing = outgoingVector(speed, direction);
+                outgoing = outgoingVector(speed.clone(), direction);
+
+            if(type === 'ball'){
+                hitBall.setSpeed(speed.clone());
+            }
 
             that.speed = outgoing.clone();
         }
@@ -65,11 +71,14 @@ class Ball extends THREE.Mesh {
 
     willCollide(){
         let direction,
-            type='ball';
+            type = 'ball',
+            hitBall = null;
         for (let ball of this.otherBalls) {
             direction = this.willCollideBall(ball);
-            if(direction)
+            if(direction){
+                hitBall = ball;
                 break;
+            }
         }
         if (!direction){
             direction = this.willCollideWall();
@@ -79,7 +88,8 @@ class Ball extends THREE.Mesh {
             return false;
         return {
             direction: direction,
-            type: type
+            type: type,
+            ball: hitBall
         }
     }
 

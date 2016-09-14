@@ -10,7 +10,7 @@
 //Regels toevoegen
 class Game {
     static get tps() {
-        return 120;
+        return 60;
     }
     constructor(renderElement) {
         this.laptopGraphics = false;
@@ -43,7 +43,21 @@ class Game {
 
         this.balls = [
             new Ball(this),
-            new Ball(this, 1, 4, 0.3075, true, 0xff0000)
+            new Ball(this, 0, 4, 0.3075, true, 0xff0000),
+            new Ball(this, 0.3, 4.6, 0.3075, true, 0xff0000),
+            new Ball(this, -0.3, 4.6, 0.3075, true, 0xff0000),
+            new Ball(this, 0, 5.2, 0.3075, true, 0xff0000),
+            new Ball(this, 0.6, 5.2, 0.3075, true, 0xff0000),
+            new Ball(this, -0.6, 5.2, 0.3075, true, 0xff0000),
+            // new Ball(this, 0.3, 5.8, 0.3075, true, 0xff0000),
+            // new Ball(this, -0.3, 5.8, 0.3075, true, 0xff0000),
+            // new Ball(this, 0.9, 5.8, 0.3075, true, 0xff0000),
+            // new Ball(this, -0.9, 5.8, 0.3075, true, 0xff0000),
+            // new Ball(this, 0, 6.4, 0.3075, true, 0xff0000),
+            // new Ball(this, 0.6, 6.4, 0.3075, true, 0xff0000),
+            // new Ball(this, -0.6, 6.4, 0.3075, true, 0xff0000),
+            // new Ball(this, 1.2, 6.4, 0.3075, true, 0xff0000),
+            // new Ball(this, -1.2, 6.4, 0.3075, true, 0xff0000)
         ];
         this.camera.lookAt(this.balls[0].position);
 
@@ -169,6 +183,8 @@ class Game {
             that.keyup(e, that);
         });
 
+        this.loopFunctions = {};
+        this.loopAmount = 0;
         this.gameloop = self.setInterval(function() {
             that.loop(that);
         }, 1000 / Game.tps);
@@ -189,6 +205,7 @@ class Game {
         this.highlighting = false;
         this.highlightedBall = null;
         this.selectedBall = that.balls[0];
+
     }
 
     pointsToShape(...points) {
@@ -241,7 +258,18 @@ class Game {
         that.mousePos.y = -(e.clientY / window.innerHeight) * 2 + 1;
     }
 
+    addLoop(fun){
+        this.loopFunctions[this.loopAmount] = fun;
+        return this.loopAmount++;
+    }
+    removeLoop(funIndex){
+        delete this.loopFunctions[funIndex];
+    }
+
     loop(that) {
+        for(let funKey in that.loopFunctions)
+            that.loopFunctions[funKey]();
+
         let rotateSpeed = 3 / Game.tps;
         if (that.isPressed('Shift'))
             rotateSpeed /= 5;
