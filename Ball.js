@@ -31,48 +31,59 @@ class Ball extends THREE.Mesh {
             clearInterval(this.ballLoop);
         this.nextPosition = this.position.clone().addVectors(this.speed, this.position);
         this.ballLoop = self.setInterval(function() {
-            that.moveBall(that, speed);
+            that.moveBall(that);
         }, 1000 / Game.tps);
     }
-    moveBall(that, speed) {
+    moveBall(that) {
         that.speed.multiplyScalar(1 - that.rollFriction / Game.tps);
-        let stopThreshold = 0.01;
+        let stopThreshold = 0.001;
         if (Math.abs(that.speed.x) < stopThreshold && Math.abs(that.speed.y) < stopThreshold && Math.abs(that.speed.z) < stopThreshold) {
             that.speed.set(0, 0, 0);
             clearInterval(that.ballLoop);
         }
-
-        let collision = false;
         that.currentPosition = that.nextPosition.clone();
-        for (let ball of that.otherBalls) {
-            let ballCollision = that.willCollideBall(ball);
-            if (ballCollision) {
-                console.log('direction:', ballCollision);
-                console.log('speed:', that.speed);
-                that.speed.set(0, 0, 0);
-                that.speed.set(0, 0, 0);
-                clearInterval(that.ballLoop);
-                collision = true;
-                break;
-            }else{
-                let closestWall = that.angleToWallCollision();
-                if(closestWall){
-                    that.speed.set(0, 0, 0);
-                    that.speed.set(0, 0, 0);
-                    clearInterval(that.ballLoop);
-                    collision = true;
-                    break;
-                }
-            }
+
+        let collision = that.willCollide();
+
+        if(collision){
+            console.log('collision');
+            let direction = collision.direction,
+                type = collision.type;
+
+            direction.reflect(direction);
+            let speed = that.speed.clone();
+
+            let outgoingVector=((d, n) => d.sub(n.multiplyScalar(d.dot(n)*2))),
+                outgoing = outgoingVector(speed, direction);
+
+            that.speed = outgoing.clone();
         }
 
-        if (!collision) {
-            that.position.set(that.currentPosition.x, that.currentPosition.y, that.currentPosition.z);
-            that.nextPosition = that.currentPosition.addVectors(that.speed, that.position);
+        that.position.set(that.currentPosition.x, that.currentPosition.y, that.currentPosition.z);
+        that.nextPosition = that.currentPosition.addVectors(that.speed, that.position);
+    }
+
+    willCollide(){
+        let direction,
+            type='ball';
+        for (let ball of this.otherBalls) {
+            direction = this.willCollideBall(ball);
+            if(direction)
+                break;
+        }
+        if (!direction){
+            direction = this.willCollideWall();
+            type='wall';
+        }
+        if(!direction)
+            return false;
+        return {
+            direction: direction,
+            type: type
         }
     }
 
-    angleToWallCollision() {
+    willCollideWall() {
         let pX = this.nextPosition.x > 0, //Bal zit in de positieve X helft
             pZ = this.nextPosition.z > 0 //Bal zit in de positieve Z helft
         let directions = [];
@@ -95,7 +106,7 @@ class Ball extends THREE.Mesh {
         !pZ && !pX && directions.push(new THREE.Vector3(-1, 0, -2));
 
         directions.map((d) => d.normalize()); //misschien niet nodig
-        let startPoint = this.position,
+        let startPoint = this.nextPosition,
             ray = new THREE.Raycaster(startPoint),
             closestWall = Infinity,
             dir = false;
@@ -103,7 +114,6 @@ class Ball extends THREE.Mesh {
             ray.ray.direction = direction;
             let intersects = ray.intersectObjects([this.game.wallMesh]);
             if (intersects.length > 0) {
-                console.log(intersects);
 
                 if (intersects[0].distance < closestWall) {
                     dir = direction;
@@ -113,7 +123,7 @@ class Ball extends THREE.Mesh {
         }
         if (!dir || closestWall > this.radius)
             return false;
-        return Math.atan2(dir.x, dir.z);
+        return dir;
     }
 
     directionTo(ball) {

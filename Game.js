@@ -13,13 +13,13 @@ class Game {
         return 120;
     }
     constructor(renderElement) {
-        this.laptopGraphics = true;
+        this.laptopGraphics = false;
         this.scene = new THREE.Scene();
         this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
 
         this.renderElement = $(renderElement);
         this.camera = new THREE.PerspectiveCamera(45, this.renderElement.width() / this.renderElement.height(), 0.1, 10000);
-        this.camera.position.x = 0;
+        this.camera.position.x = 0.001;
         this.camera.position.y = 20;
         this.camera.position.z = 0;
         this.camera.rotateY(Math.PI / 2);
