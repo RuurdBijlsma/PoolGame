@@ -1,5 +1,5 @@
 class Ball extends THREE.Mesh {
-    constructor(game, x = 0, z = 0, radius = 0.3075, shadow = true, color = 0xffffff) {
+    constructor(game, x = 0, z = 0, radius = 0.3075, shadow = true, color = 0xffffff, number = 0) {
         let geometry = new THREE.SphereGeometry(radius, 36, 36),
             material = new THREE.MeshPhongMaterial({
                 color: color
@@ -11,6 +11,7 @@ class Ball extends THREE.Mesh {
         this.castShadow = shadow;
         this.mass = 1;
         this.restitution = 0.8;
+        this.number = number;
         game.scene.add(this);
 
         //reflectivity

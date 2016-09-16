@@ -49,21 +49,26 @@ class Game {
 
         this.balls = [
             new Ball(this),
-            new Ball(this, 0, 4, 0.3075, true, 0xff0000),
-            // new Ball(this, 0.3, 4.6, 0.3075, true, 0xff0000),
-            // new Ball(this, -0.3, 4.6, 0.3075, true, 0xff0000),
-            // new Ball(this, 0, 5.2, 0.3075, true, 0xff0000),
-            // new Ball(this, 0.6, 5.2, 0.3075, true, 0xff0000),
-            // new Ball(this, -0.6, 5.2, 0.3075, true, 0xff0000),
-            // new Ball(this, 0.3, 5.8, 0.3075, true, 0xff0000),
-            // new Ball(this, -0.3, 5.8, 0.3075, true, 0xff0000),
-            // new Ball(this, 0.9, 5.8, 0.3075, true, 0xff0000),
-            // new Ball(this, -0.9, 5.8, 0.3075, true, 0xff0000),
-            // new Ball(this, 0, 6.4, 0.3075, true, 0xff0000),
-            // new Ball(this, 0.6, 6.4, 0.3075, true, 0xff0000),
-            // new Ball(this, -0.6, 6.4, 0.3075, true, 0xff0000),
-            // new Ball(this, 1.2, 6.4, 0.3075, true, 0xff0000),
-            // new Ball(this, -1.2, 6.4, 0.3075, true, 0xff0000)
+
+            new Ball(this, 0, 4, 0.3075, true, 0xffff00, 1),
+
+            new Ball(this, -0.3, 4.6, 0.3075, true, 0xff0100, 3),
+            new Ball(this, 0.3, 4.6, 0.3075, true, 0xff0100, 11),
+
+            new Ball(this, 0, 5.2, 0.3075, true, 0x000000, 8),
+            new Ball(this, 0.6, 5.2, 0.3075, true, 0x004008, 6),
+            new Ball(this, -0.6, 5.2, 0.3075, true, 0x004008, 14),
+
+            new Ball(this, 0.3, 5.8, 0.3075, true, 0xcc0000, 15),
+            new Ball(this, -0.3, 5.8, 0.3075, true, 0x240044, 4),
+            new Ball(this, 0.9, 5.8, 0.3075, true, 0xff2200, 13),
+            new Ball(this, -0.9, 5.8, 0.3075, true, 0xffff00, 9),
+
+            new Ball(this, 0, 6.4, 0.3075, true, 0x073fe4, 10),
+            new Ball(this, 0.6, 6.4, 0.3075, true, 0x073fe4, 2),
+            new Ball(this, -0.6, 6.4, 0.3075, true, 0xff2200, 5),
+            new Ball(this, 1.2, 6.4, 0.3075, true, 0xcc0000, 7),
+            new Ball(this, -1.2, 6.4, 0.3075, true, 0x240044, 12)
         ];
         this.balls[0].stoppedRolling = this.whiteStop;
         this.camera.lookAt(this.balls[0].position);
@@ -279,6 +284,7 @@ class Game {
         if (that.highlightedBall) {
             that.animateObject(that.keu, that.highlightedBall.position, 500);
             that.selectedBall = that.highlightedBall;
+            console.log(that.selectedBall.number);
         }
     }
 
