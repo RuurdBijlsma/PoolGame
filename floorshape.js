@@ -17,4 +17,4 @@ floorShape = [
     new THREE.Vector2(7.1, -12.75),
     new THREE.Vector2(6.375, -13.125),
     new THREE.Vector2(6, -13.85)
-]
+];

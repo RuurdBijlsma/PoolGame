@@ -1,7 +1,7 @@
 /**
  * @namespace
  */
-var THREEx	= THREEx || {}
+var THREEx	= THREEx || {};
 
 /**
  * dilate a geometry inplace

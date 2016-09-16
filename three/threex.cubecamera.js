@@ -6,12 +6,12 @@ THREEx.CubeCamera	= function(object3d, textureW){
 
 	// create the camera
 	var camera	= new THREE.CubeCamera( 0.001, 1000, textureW );
-	camera.position	= object3d.position
-	this.camera	= camera
+	camera.position	= object3d.position;
+	this.camera	= camera;
 
 	// TODO not sure how usefull are those
-	this.object3d	= camera
-	this.textureCube= camera.renderTarget
+	this.object3d	= camera;
+	this.textureCube= camera.renderTarget;
 
 	// to avoid flickering on the border of the sphere
 	camera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
@@ -26,72 +26,72 @@ THREEx.CubeCamera	= function(object3d, textureW){
 
 		// // TODO compute position as world position
 		// camera.position.copy(position)
-		camera.updateCubeMap(renderer, scene)
+		camera.updateCubeMap(renderer, scene);
 
 		object3d.visible	= true;		// *cough*			
 	}
-}
+};
 
 THREEx.CubeCamera.toImages	= function(cubeCamera, renderer, textureW){
-	console.assert( cubeCamera instanceof THREE.CubeCamera )
+	console.assert( cubeCamera instanceof THREE.CubeCamera );
 
-	textureW	= textureW	|| cubeCamera.renderTarget.width
+	textureW	= textureW	|| cubeCamera.renderTarget.width;
 
 	// init scene
 	var sceneRTT	= new THREE.Scene();
 
 	// init skybox to screenshot 
-	var shader	= THREE.ShaderLib['cube']
-	var uniforms	= THREE.UniformsUtils.clone(shader.uniforms)
+	var shader	= THREE.ShaderLib['cube'];
+	var uniforms	= THREE.UniformsUtils.clone(shader.uniforms);
 	var material = new THREE.ShaderMaterial({
 		fragmentShader	: shader.fragmentShader,
 		vertexShader	: shader.vertexShader,
 		uniforms	: uniforms,
 		depthWrite	: false,
 		side		: THREE.BackSide
-	})
+	});
 	// set the cubeCamera.renderTarget
 	uniforms[ "tCube" ].value	= cubeCamera.renderTarget;
 
 	// init geometry
-	var geometry	= new THREE.BoxGeometry(500, 500, 500)
+	var geometry	= new THREE.BoxGeometry(500, 500, 500);
 	var mesh	= new THREE.Mesh(geometry, material);
-	sceneRTT.add(mesh)
+	sceneRTT.add(mesh);
 
 	// backup renderer parameters
 	var old	= {
 		width		: renderer.domElement.width,
 		height		: renderer.domElement.height,
 		devicePixelRatio: renderer.devicePixelRatio,
-	}
+	};
 	// set new renderer parameters
 	renderer.setSize( textureW, textureW );
-	renderer.devicePixelRatio	= 1
+	renderer.devicePixelRatio	= 1;
 
-	var images	= []
+	var images	= [];
 	cubeCamera.children.slice().forEach(function(subCamera){
 		// render sceneRtt with subCamera
-		renderer.render(sceneRTT, subCamera)
+		renderer.render(sceneRTT, subCamera);
 
 		// clone renderer.domElement
-		var canvas	= document.createElement('canvas')
-		canvas.width	= renderer.domElement.width
-		canvas.height	= renderer.domElement.height
-		var context	= canvas.getContext('2d')
+		var canvas	= document.createElement('canvas');
+		canvas.width	= renderer.domElement.width;
+		canvas.height	= renderer.domElement.height;
+		var context	= canvas.getContext('2d');
 		// mirror in y axis - im not sure why it is needed
 		context.translate(0, canvas.height);
-		context.scale(1,-1)
+		context.scale(1,-1);
 		// draw the image in the cloned canvas
-		context.drawImage(renderer.domElement, 0, 0)
+		context.drawImage(renderer.domElement, 0, 0);
 
 		// store cloned canvas
 		images.push(canvas)
-	})
+	});
 
 	// restore renderer parameters
-	renderer.devicePixelRatio	= old.devicePixelRatio
+	renderer.devicePixelRatio	= old.devicePixelRatio;
 	renderer.setSize(old.width, old.height );
 
 	// return the just-built image
 	return images
-}
+};

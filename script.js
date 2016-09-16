@@ -1,5 +1,8 @@
 $(document).ready(function() {
     game = new Game(document.getElementById('renderView'));
+    self.setTimeout(function(){
+        //game.balls[1].setSpeed(new THREE.Vector3(0, 0, -0.1));
+    }, 1000);
 });
 
 

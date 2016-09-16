@@ -2,7 +2,7 @@
 //Gaten mooier maken
 //Rest van tafel maken
 //Physics
-//Keu animatie bij shieten
+//Keu animatie bij shieten DONE
 //Schieten fixen (hoek soms)
 //Niet schieten mogelijk als de keu er niet is
 //Alle ballen toevoegen
@@ -10,7 +10,13 @@
 //Regels toevoegen
 class Game {
     static get tps() {
-        return 60;
+        return 120;
+    }
+    static get tableSize() {
+        return {
+            z: 27,
+            x: 13.5
+        }
     }
     constructor(renderElement) {
         this.laptopGraphics = false;
@@ -44,11 +50,11 @@ class Game {
         this.balls = [
             new Ball(this),
             new Ball(this, 0, 4, 0.3075, true, 0xff0000),
-            new Ball(this, 0.3, 4.6, 0.3075, true, 0xff0000),
-            new Ball(this, -0.3, 4.6, 0.3075, true, 0xff0000),
-            new Ball(this, 0, 5.2, 0.3075, true, 0xff0000),
-            new Ball(this, 0.6, 5.2, 0.3075, true, 0xff0000),
-            new Ball(this, -0.6, 5.2, 0.3075, true, 0xff0000),
+            // new Ball(this, 0.3, 4.6, 0.3075, true, 0xff0000),
+            // new Ball(this, -0.3, 4.6, 0.3075, true, 0xff0000),
+            // new Ball(this, 0, 5.2, 0.3075, true, 0xff0000),
+            // new Ball(this, 0.6, 5.2, 0.3075, true, 0xff0000),
+            // new Ball(this, -0.6, 5.2, 0.3075, true, 0xff0000),
             // new Ball(this, 0.3, 5.8, 0.3075, true, 0xff0000),
             // new Ball(this, -0.3, 5.8, 0.3075, true, 0xff0000),
             // new Ball(this, 0.9, 5.8, 0.3075, true, 0xff0000),
@@ -59,6 +65,7 @@ class Game {
             // new Ball(this, 1.2, 6.4, 0.3075, true, 0xff0000),
             // new Ball(this, -1.2, 6.4, 0.3075, true, 0xff0000)
         ];
+        this.balls[0].stoppedRolling = this.whiteStop;
         this.camera.lookAt(this.balls[0].position);
 
         this.lights = {
@@ -183,8 +190,10 @@ class Game {
             that.keyup(e, that);
         });
 
-        this.loopFunctions = {};
-        this.loopAmount = 0;
+        this.loopFunctions = {
+            0:function(){}
+        };
+        this.loopAmount = 1;
         this.gameloop = self.setInterval(function() {
             that.loop(that);
         }, 1000 / Game.tps);
@@ -234,16 +243,34 @@ class Game {
     }
 
     shoot() {
-        let rotation = this.keu.rotation.y,
+        let backPos = this.keu.children[0].position.clone(),
+            frontPos = backPos.clone(),
+            origPos = backPos.clone(),
             power = 12 / Game.tps;
-        if (this.keu.rotation.x < -1)
-            rotation = Math.PI - rotation;
-        else if (this.keu.rotation.y < 0)
-            rotation = 2 * Math.PI + rotation;
-        let x = Math.cos(rotation),
-            z = Math.sin(rotation),
-            speed = new THREE.Vector3(z, 0, x).multiplyScalar(power);
-        this.selectedBall.setSpeed(speed);
+        backPos.z-=power*5;
+        frontPos.z += 1;
+
+        let that = this;
+        this.animateObject(this.keu.children[0], backPos, 500);
+        self.setTimeout(function(){
+            that.animateObject(that.keu.children[0], frontPos, 500);
+            self.setTimeout(function(){
+
+                let rotation = that.keu.rotation.y;
+                if (that.keu.rotation.x < -1)
+                    rotation = Math.PI - rotation;
+                else if (that.keu.rotation.y < 0)
+                    rotation = 2 * Math.PI + rotation;
+                let x = Math.cos(rotation),
+                    z = Math.sin(rotation),
+                    speed = new THREE.Vector3(z, 0, x).multiplyScalar(power);
+
+                that.selectedBall.setSpeed(speed);
+
+                that.animateObject(that.keu.children[0], origPos, 700);
+
+            },300);
+        },500);
     }
 
     mousedown(e, that) {
@@ -264,9 +291,19 @@ class Game {
     }
     removeLoop(funIndex){
         delete this.loopFunctions[funIndex];
+        return false;
+    }
+
+    whiteStop(game){
+        game.animateObject(game.keu, this.position, 1000);
     }
 
     loop(that) {
+        for(let i=0;i<that.balls.length;i++)
+            for(let j=i+1;j<that.balls.length;j++)
+                if(that.balls[i].colliding(that.balls[j]))
+                    that.balls[i].resolveCollision(that.balls[j]);
+
         for(let funKey in that.loopFunctions)
             that.loopFunctions[funKey]();
 
@@ -363,8 +400,8 @@ class Game {
         requestAnimationFrame(function() {
             that.render(that);
         });
-        if(!that.laptopGraphics)
-            for (let ball of that.balls)
-                ball.cubeCamera.update(that.renderer, that.scene);
+        // if(!that.laptopGraphics)
+        //     for (let ball of that.balls)
+        //         ball.cubeCamera.update(that.renderer, that.scene);
     }
 }

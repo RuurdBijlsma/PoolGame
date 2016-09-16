@@ -35,4 +35,4 @@ wallShape = [
 		new THREE.Vector2(-6.75, 0.75),
 		new THREE.Vector2(-6.75, 12.5)
 	)
-]
+];
