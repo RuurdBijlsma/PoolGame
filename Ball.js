@@ -1,11 +1,17 @@
 class Ball extends THREE.Mesh {
-    constructor(game, x = 0, z = 0, radius = 0.3075, shadow = true, color = 0xffffff, number = 0) {
+    constructor(game, x = 0, z = 0, radius = 0.3075, shadow = true, number = 0, stripe = false) {
+        let textureLoader = new THREE.TextureLoader();
+        let map = textureLoader.load(`img/balls/${number}.png`);
+
         let geometry = new THREE.SphereGeometry(radius, 36, 36),
-            material = new THREE.MeshPhongMaterial({
-                color: color
+            material = new THREE.MeshPhongMaterial(number === 0 ? {color: 0xffffff}:{
+                map: map
             });
         super(geometry, material);
-        this.color = new THREE.Color(color);
+
+
+        //this.color = new THREE.Color(color);
+        this.stripe = stripe;
         this.radius = radius;
         this.position.set(x, radius, z);
         this.castShadow = shadow;
@@ -80,9 +86,9 @@ class Ball extends THREE.Mesh {
             scorePocket = 6;
 
         if(scorePocket){
-            console.log('score! in nummer ',scorePocket, 'ball: ', that);
             that.speed.set(0,0,0);
             that.ballLoop=that.game.removeLoop(that.ballLoop);
+            game.score(that.number, that.stripe, scorePocket);
             let downPos = that.position.clone();
             downPos.y -= 3;
             that.game.animateObject(that, downPos, 500);
@@ -151,6 +157,6 @@ class Ball extends THREE.Mesh {
         let outgoingVector=((d, n) => d.sub(n.multiplyScalar(d.dot(n)*2))),
             outgoing = outgoingVector(this.speed.clone(), direction);
         this.setSpeed(outgoing.clone());
-        ball.setSpeed(direction);
+        ball.setSpeed(direction.normalize().multiplyScalar(this.speed.length()));
     }
 }

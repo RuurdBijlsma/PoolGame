@@ -50,25 +50,25 @@ class Game {
         this.balls = [
             new Ball(this),
 
-            new Ball(this, 0, 4, 0.3075, true, 0xffff00, 1),
+            new Ball(this, 0, 4, 0.3075, true, 1, false),
 
-            new Ball(this, -0.3, 4.6, 0.3075, true, 0xff0100, 3),
-            new Ball(this, 0.3, 4.6, 0.3075, true, 0xff0100, 11),
+            new Ball(this, -0.32, 4.6, 0.3075, true, 3, false),
+            new Ball(this, 0.32, 4.6, 0.3075, true, 11, true),
 
-            new Ball(this, 0, 5.2, 0.3075, true, 0x000000, 8),
-            new Ball(this, 0.6, 5.2, 0.3075, true, 0x004008, 6),
-            new Ball(this, -0.6, 5.2, 0.3075, true, 0x004008, 14),
+            new Ball(this, 0, 5.2, 0.3075, true, 8, false),
+            new Ball(this, 0.64, 5.2, 0.3075, true, 6, false),
+            new Ball(this, -0.64, 5.2, 0.3075, true, 14, true),
 
-            new Ball(this, 0.3, 5.8, 0.3075, true, 0xcc0000, 15),
-            new Ball(this, -0.3, 5.8, 0.3075, true, 0x240044, 4),
-            new Ball(this, 0.9, 5.8, 0.3075, true, 0xff2200, 13),
-            new Ball(this, -0.9, 5.8, 0.3075, true, 0xffff00, 9),
+            new Ball(this, 0.32, 5.8, 0.3075, true, 15, true),
+            new Ball(this, -0.32, 5.8, 0.3075, true, 4, false),
+            new Ball(this, 0.96, 5.8, 0.3075, true, 13, true),
+            new Ball(this, -0.96, 5.8, 0.3075, true, 9, true),
 
-            new Ball(this, 0, 6.4, 0.3075, true, 0x073fe4, 10),
-            new Ball(this, 0.6, 6.4, 0.3075, true, 0x073fe4, 2),
-            new Ball(this, -0.6, 6.4, 0.3075, true, 0xff2200, 5),
-            new Ball(this, 1.2, 6.4, 0.3075, true, 0xcc0000, 7),
-            new Ball(this, -1.2, 6.4, 0.3075, true, 0x240044, 12)
+            new Ball(this, 0, 6.4, 0.3075, true, 10, true),
+            new Ball(this, 0.64, 6.4, 0.3075, true, 2, false),
+            new Ball(this, -0.64, 6.4, 0.3075, true, 5, false),
+            new Ball(this, 1.28, 6.4, 0.3075, true, 7, false),
+            new Ball(this, -1.28, 6.4, 0.3075, true, 12, true)
         ];
         this.balls[0].stoppedRolling = this.whiteStop;
         this.camera.lookAt(this.balls[0].position);
@@ -222,6 +222,13 @@ class Game {
 
     }
 
+    score(number, stripe, scorePocket){
+        if(number === 0)
+            console.log('de witte moet er niet in');
+        else
+            console.log(`ball ${number} scored a point for ${stripe?'streep':'niet-streep'} in pocket ${scorePocket}`);
+    }
+
     pointsToShape(...points) {
         points.reverse();
         return new THREE.Shape(points);
@@ -248,11 +255,11 @@ class Game {
     }
 
     shoot() {
-        let backPos = this.keu.children[0].position.clone(),
-            frontPos = backPos.clone(),
-            origPos = backPos.clone(),
+        let origPos = new THREE.Vector3(0, 0.9, -8.5),
+            backPos = origPos.clone(),
+            frontPos = origPos.clone(),
             power = 12 / Game.tps;
-        backPos.z-=power*5;
+        backPos.z -= power*5;
         frontPos.z += 1;
 
         let that = this;
@@ -284,7 +291,6 @@ class Game {
         if (that.highlightedBall) {
             that.animateObject(that.keu, that.highlightedBall.position, 500);
             that.selectedBall = that.highlightedBall;
-            console.log(that.selectedBall.number);
         }
     }
 
@@ -308,8 +314,8 @@ class Game {
 
     loop(that) {
         for(let i=0;i<that.balls.length;i++)
-            for(let j=i+1;j<that.balls.length;j++)
-                if(that.balls[i].colliding(that.balls[j]))
+            for(let j=0;j<that.balls.length;j++)
+                if(i!=j&&that.balls[i].colliding(that.balls[j]))
                     that.balls[i].resolveCollision(that.balls[j]);
 
         for(let funKey in that.loopFunctions)
@@ -335,10 +341,10 @@ class Game {
             for (let i = 0; i < selectable.length; i++) {
                 let index = intersects.indexOf(selectable[i]);
                 if (index === -1) {
-                    selectable[i].material.color.set(that.balls[i].color);
+                    // selectable[i].material.color.set(that.balls[i].color);
                 } else {
                     that.highlightedBall = that.balls[i];
-                    selectable[i].material.color.set(0xff00ff);
+                    // selectable[i].material.color.set(0xff00ff);
                     highLighter = true;
                 }
             }
