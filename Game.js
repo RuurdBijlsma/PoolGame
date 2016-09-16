@@ -4,9 +4,9 @@
 //Physics
 //Keu animatie bij shieten DONE
 //Schieten fixen (hoek soms)
-//Niet schieten mogelijk als de keu er niet is
+//Niet schieten mogelijk als de keu er niet is DONE
 //Alle ballen toevoegen
-//Scoren toevoegen
+//Scoren toevoegen DONE
 //Regels toevoegen
 class Game {
     static get tps() {
@@ -257,6 +257,8 @@ class Game {
             self.setTimeout(function(){
 
                 let rotation = that.keu.rotation.y;
+                if(that.keu.rotation.x === Math.PI)
+                    rotation = Math.PI - rotation;
                 if (that.keu.rotation.x < -1)
                     rotation = Math.PI - rotation;
                 else if (that.keu.rotation.y < 0)

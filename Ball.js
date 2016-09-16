@@ -67,14 +67,21 @@ class Ball extends THREE.Mesh {
         if(that.position.x < 6.5 && that.position.z > 13.5)
             scorePocket = 2;
 
+        if(that.position.x < -7.25 && that.position.z < 2 && that.position.z > -2)
+            scorePocket = 3;
+
         if(that.position.x < -6.5 && that.position.z < -13.5)
             scorePocket = 4;
         if(that.position.x > 6.5 && that.position.z < -13.5)
             scorePocket = 5;
 
+        if(that.position.x > 7.25 && that.position.z < 2 && that.position.z > -2)
+            scorePocket = 6;
+
         if(scorePocket){
-            console.log('score! in nummer ',scorePocket);
+            console.log('score! in nummer ',scorePocket, 'ball: ', that);
             that.speed.set(0,0,0);
+            that.ballLoop=that.game.removeLoop(that.ballLoop);
             let downPos = that.position.clone();
             downPos.y -= 3;
             that.game.animateObject(that, downPos, 500);
