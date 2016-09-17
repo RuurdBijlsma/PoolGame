@@ -225,7 +225,7 @@ class Game {
         this.highlighting = false;
         this.highlightedBall = null;
         this.selectedBall = that.balls[0];
-        this.power = 50;
+        this.power = 30;
 
 
         this.lineMaterial = new THREE.LineBasicMaterial({

@@ -75,9 +75,9 @@ class Ball extends THREE.Mesh {
 
             if (direction) {
                 direction.reflect(direction).normalize();
-                if(distance - game.selectedBall.radius < 0){
-                    console.log('stuk');
+                if(distance - that.radius < 0){
                     that.position.add(direction.clone().multiplyScalar(distance));
+                    that.currentPosition = that.position.clone();
                 }
                 let speed = that.speed;
 
@@ -201,7 +201,14 @@ class Ball extends THREE.Mesh {
         direction.normalize();
         let outgoingVector = ((d, n) => d.sub(n.multiplyScalar(d.dot(n) * 2))),
             outgoing = outgoingVector(this.speed.clone(), direction);
-        this.setSpeed(outgoing.clone());
-        ball.setSpeed(direction.normalize().multiplyScalar(this.speed.length()));
+
+        if(this.speed.length() < 0.001){
+            let moveOut = direction.clone();
+            moveOut.normalize();
+            this.position.add(moveOut.multiplyScalar(ball.position.distanceTo(this.position) - ball.radius - this.radius))
+        }else{
+            this.setSpeed(outgoing.clone());
+            ball.setSpeed(direction.normalize().multiplyScalar(this.speed.length()));
+        }
     }
 }
