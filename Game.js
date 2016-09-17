@@ -3,11 +3,16 @@
 //Rest van tafel maken
 //Physics
 //Keu animatie bij shieten DONE
-//Schieten fixen (hoek soms)
+//Schieten fixen (hoek soms) DONE
 //Niet schieten mogelijk als de keu er niet is DONE
-//Alle ballen toevoegen
+//Alle ballen toevoegen DONE
 //Scoren toevoegen DONE
 //Regels toevoegen
+
+//players toevoegen
+    //players beginnen zonder side
+    //nadat de eerste legale bal is gepocket krijgt die player de streep of niet streep side
+    //https://www.wikiwand.com/en/Eight-ball#/Standardized_rules_of_play
 class Game {
     static get tps() {
         return 120;
@@ -19,6 +24,7 @@ class Game {
         }
     }
     constructor(renderElement) {
+        this.cheatLine = false;
         this.laptopGraphics = false;
         this.scene = new THREE.Scene();
         this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
@@ -35,7 +41,7 @@ class Game {
             antialias: true
         });
         this.renderer.shadowMap.enabled = true;
-        if(this.laptopGraphics)
+        if (this.laptopGraphics)
             this.renderer.shadowMap.type = THREE.BasicShadowMap;
         else
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -48,27 +54,27 @@ class Game {
         this.controls = new THREE.OrbitControls(this.camera, renderElement);
 
         this.balls = [
-            new Ball(this),
+            new Ball(this,0, -13.5 / 2),
 
-            new Ball(this, 0, 4, 0.3075, true, 1, false),
+            new Ball(this, 0, 4 + 2.75, 0.3075, true, 1, false),
 
-            new Ball(this, -0.32, 4.6, 0.3075, true, 3, false),
-            new Ball(this, 0.32, 4.6, 0.3075, true, 11, true),
+            new Ball(this, -0.32, 4.6 + 2.75, 0.3075, true, 3, false),
+            new Ball(this, 0.32, 4.6 + 2.75, 0.3075, true, 11, true),
 
-            new Ball(this, 0, 5.2, 0.3075, true, 8, false),
-            new Ball(this, 0.64, 5.2, 0.3075, true, 6, false),
-            new Ball(this, -0.64, 5.2, 0.3075, true, 14, true),
+            new Ball(this, 0, 5.2 + 2.75, 0.3075, true, 8, false),
+            new Ball(this, 0.64, 5.2 + 2.75, 0.3075, true, 6, false),
+            new Ball(this, -0.64, 5.2 + 2.75, 0.3075, true, 14, true),
 
-            new Ball(this, 0.32, 5.8, 0.3075, true, 15, true),
-            new Ball(this, -0.32, 5.8, 0.3075, true, 4, false),
-            new Ball(this, 0.96, 5.8, 0.3075, true, 13, true),
-            new Ball(this, -0.96, 5.8, 0.3075, true, 9, true),
+            new Ball(this, 0.32, 5.8 + 2.75, 0.3075, true, 15, true),
+            new Ball(this, -0.32, 5.8 + 2.75, 0.3075, true, 4, false),
+            new Ball(this, 0.96, 5.8 + 2.75, 0.3075, true, 13, true),
+            new Ball(this, -0.96, 5.8 + 2.75, 0.3075, true, 9, true),
 
-            new Ball(this, 0, 6.4, 0.3075, true, 10, true),
-            new Ball(this, 0.64, 6.4, 0.3075, true, 2, false),
-            new Ball(this, -0.64, 6.4, 0.3075, true, 5, false),
-            new Ball(this, 1.28, 6.4, 0.3075, true, 7, false),
-            new Ball(this, -1.28, 6.4, 0.3075, true, 12, true)
+            new Ball(this, 0, 6.4 + 2.75, 0.3075, true, 10, true),
+            new Ball(this, 0.64, 6.4 + 2.75, 0.3075, true, 2, false),
+            new Ball(this, -0.64, 6.4 + 2.75, 0.3075, true, 5, false),
+            new Ball(this, 1.28, 6.4 + 2.75, 0.3075, true, 7, false),
+            new Ball(this, -1.28, 6.4 + 2.75, 0.3075, true, 12, true)
         ];
         this.balls[0].stoppedRolling = this.whiteStop;
         this.camera.lookAt(this.balls[0].position);
@@ -146,9 +152,9 @@ class Game {
                 texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
                 texture.repeat.set(0.15, 0.15);
 
-                let materialSettings = that.laptopGraphics?{
+                let materialSettings = that.laptopGraphics ? {
                     map: texture
-                }:{
+                } : {
                     map: texture,
                     bumpScale: 0.01,
                     bumpMap: texture
@@ -196,7 +202,7 @@ class Game {
         });
 
         this.loopFunctions = {
-            0:function(){}
+            0: function() {}
         };
         this.loopAmount = 1;
         this.gameloop = self.setInterval(function() {
@@ -219,12 +225,18 @@ class Game {
         this.highlighting = false;
         this.highlightedBall = null;
         this.selectedBall = that.balls[0];
+        this.power = 50;
+
+
+        this.lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x0000ff
+        });
 
     }
 
-    score(number, stripe, scorePocket){
-        if(number === 0)
-            console.log('de witte moet er niet in');
+    score(number, stripe, scorePocket) {
+        if (number === 0)
+            this.freePlace(this.balls.filter((ball)=>ball.number===0)[0]);
         else
             console.log(`ball ${number} scored a point for ${stripe?'streep':'niet-streep'} in pocket ${scorePocket}`);
     }
@@ -258,18 +270,18 @@ class Game {
         let origPos = new THREE.Vector3(0, 0.9, -8.5),
             backPos = origPos.clone(),
             frontPos = origPos.clone(),
-            power = 12 / Game.tps;
-        backPos.z -= power*5;
-        frontPos.z += 1;
+            power = this.power / Game.tps;
+        backPos.z -= power * 5;
+        frontPos.z += 2;
 
         let that = this;
         this.animateObject(this.keu.children[0], backPos, 500);
-        self.setTimeout(function(){
+        self.setTimeout(function() {
             that.animateObject(that.keu.children[0], frontPos, 500);
-            self.setTimeout(function(){
+            self.setTimeout(function() {
 
                 let rotation = that.keu.rotation.y;
-                if(that.keu.rotation.x === Math.PI)
+                if (that.keu.rotation.x === Math.PI)
                     rotation = Math.PI - rotation;
                 if (that.keu.rotation.x < -1)
                     rotation = Math.PI - rotation;
@@ -283,14 +295,22 @@ class Game {
 
                 that.animateObject(that.keu.children[0], origPos, 700);
 
-            },300);
-        },500);
+            }, 300);
+        }, 500);
     }
 
     mousedown(e, that) {
+        if(that.placeLoop){
+            that.placeLoop=that.removeLoop(that.placeLoop);
+        }
+
         if (that.highlightedBall) {
             that.animateObject(that.keu, that.highlightedBall.position, 500);
             that.selectedBall = that.highlightedBall;
+            if(e.ctrlKey){
+                console.log(that.selectedBall.number);
+                that.freePlace(that.selectedBall);
+            }
         }
     }
 
@@ -299,43 +319,127 @@ class Game {
         that.mousePos.y = -(e.clientY / window.innerHeight) * 2 + 1;
     }
 
-    addLoop(fun){
+    addLoop(fun) {
         this.loopFunctions[this.loopAmount] = fun;
         return this.loopAmount++;
     }
-    removeLoop(funIndex){
+    removeLoop(funIndex) {
         delete this.loopFunctions[funIndex];
         return false;
     }
 
-    whiteStop(game){
+    whiteStop(game) {
         game.animateObject(game.keu, this.position, 1000);
     }
 
+    linePlace(ball, line = -6.75){
+        let that = this;
+        this.placeLoop = that.addLoop(function(){
+            that.raycaster.setFromCamera(that.mousePos, that.camera);
+            let intersects = that.raycaster.intersectObjects([that.floorMesh]);
+
+            if (intersects.length !== 0) {
+                that.placeLocation = intersects[0].point;
+                let p = that.placeLocation;
+                if(p.x <= Game.tableSize.x/2-0.05 - ball.radius && p.x >= -Game.tableSize.x/2+0.05 + ball.radius)
+                    if(!that.collidingAny(new THREE.Vector3(p.x, ball.radius, p.z), ball))
+                        ball.position.set(p.x, ball.radius, line);
+            }
+        });
+    }
+
+    freePlace(ball){
+        ball.speed.set(0,0,0);
+        ball.ballLoop = this.removeLoop(ball.ballLoop);
+        let that = this;
+        this.placeLoop = that.addLoop(function(){
+            that.raycaster.setFromCamera(that.mousePos, that.camera);
+            let intersects = that.raycaster.intersectObjects([that.floorMesh]);
+
+            if (intersects.length !== 0) {
+                that.placeLocation = intersects[0].point;
+                let p = that.placeLocation;
+                if(p.x <= Game.tableSize.x/2-0.05 - ball.radius && p.x >= -Game.tableSize.x/2+0.05 + ball.radius)
+                    if(p.z <= Game.tableSize.z/2 - 0.05 - ball.radius && p.z >= -Game.tableSize.z/2+0.05 + ball.radius)
+                        if(!that.collidingAny(new THREE.Vector3(p.x, ball.radius, p.z), ball))
+                            ball.position.set(p.x, ball.radius, p.z);
+            }
+        });
+    }
+    collidingAny(pos, excludedBall){
+        let balls = this.balls.filter((ball) => ball !== excludedBall);
+        for(let ball of balls)
+            if(pos.distanceTo(ball.position) < ball.radius + excludedBall.radius)
+                return true;
+        return false;
+    }
+
     loop(that) {
-        for(let i=0;i<that.balls.length;i++)
-            for(let j=0;j<that.balls.length;j++)
-                if(i!=j&&that.balls[i].colliding(that.balls[j]))
+        for (let i = 0; i < that.balls.length; i++)
+            for (let j = 0; j < that.balls.length; j++)
+                if (i != j && that.balls[i].colliding(that.balls[j]))
                     that.balls[i].resolveCollision(that.balls[j]);
 
-        for(let funKey in that.loopFunctions)
+        for (let funKey in that.loopFunctions)
             that.loopFunctions[funKey]();
 
-        let rotateSpeed = 3 / Game.tps;
-        if (that.isPressed('Shift'))
-            rotateSpeed /= 5;
+        let rotateSpeed = 3 / Game.tps,
+            powerSpeed = 10 / Game.tps;
+        if (that.isPressed('Shift')){
+            rotateSpeed /= 10;
+            powerSpeed /= 5;
+        }
         if (that.isPressed('ArrowLeft')) {
             that.keu.rotateY(rotateSpeed);
         }
         if (that.isPressed('ArrowRight')) {
             that.keu.rotateY(-rotateSpeed);
         }
+        if (that.isPressed('ArrowUp')) {
+            that.power += powerSpeed;
+            console.log(that.power);
+        }
+        if (that.isPressed('ArrowDown')) {
+            that.power -= powerSpeed;
+            console.log(that.power);
+        }
+
+
+        if(that.cheatLine){
+            let rotation = that.keu.rotation.y;
+            if (that.keu.rotation.x === Math.PI)
+                rotation = Math.PI - rotation;
+            if (that.keu.rotation.x < -1)
+                rotation = Math.PI - rotation;
+            else if (that.keu.rotation.y < 0)
+                rotation = 2 * Math.PI + rotation;
+            let x = Math.cos(rotation),
+                z = Math.sin(rotation),
+                direction = new THREE.Vector3(z, 0, x).normalize(),
+                ray = new THREE.Raycaster(that.keu.position);
+            ray.ray.direction = direction;
+            let intersectables = that.balls.slice();
+            intersectables.push(that.wallMesh);
+            let wallHits = ray.intersectObjects(intersectables);
+            if (wallHits.length > 0) {
+                let lineGeometry = new THREE.Geometry();
+                lineGeometry.vertices.push(
+                    that.keu.position,
+                    wallHits[0].point
+                )
+                let line = new THREE.Line(lineGeometry, that.lineMaterial);
+                that.scene.children = that.scene.children.filter((child) => child.type !== 'Line');
+                that.scene.add(line);
+            }
+        }
+
+
         that.raycaster.setFromCamera(that.mousePos, that.camera);
 
         let selectable = that.balls.map((ball) => ball);
         let intersects = that.raycaster.intersectObjects(selectable).map((i) => i.object);
 
-        if (that.highlighting || intersects !== 0) {
+        if (that.highlighting || intersects.length !== 0) {
             let highLighter = false;
             that.highlightedBall = null;
             for (let i = 0; i < selectable.length; i++) {
@@ -369,6 +473,10 @@ class Game {
             that.southView();
         if (key === '8')
             that.northView();
+        if (key === 'c'){
+            that.scene.children = that.scene.children.filter((child) => child.type !== 'Line');
+            that.cheatLine = !that.cheatLine;
+        }
     }
 
     keyup(e, that) {

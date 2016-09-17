@@ -18,7 +18,7 @@ class SpotLight extends THREE.SpotLight {
         scene.add(this);
     }
 }
-class DirectionalLight extends THREE.DirectionalLight  {
+class DirectionalLight extends THREE.DirectionalLight {
     constructor(scene, x, y, z, target, shadow = true, color = 0xffffff, intensity = 1) {
         super(0xffffff);
         this.intensity = intensity;
@@ -35,7 +35,7 @@ class DirectionalLight extends THREE.DirectionalLight  {
         scene.add(this);
     }
 }
-class AmbientLight extends THREE.AmbientLight  {
+class AmbientLight extends THREE.AmbientLight {
     constructor(scene, color = 0xffffff, intensity = 1) {
         super(color, intensity);
         scene.add(this);
