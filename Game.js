@@ -23,6 +23,26 @@ class Game {
             x: 13.5
         }
     }
+    static get ballColors() {
+        return {
+            0: '#ffffff',
+            1: '#ffff00',
+            3: '#ff0100',
+            11: '#ff0100',
+            8: '#000000',
+            6: '#004008',
+            14: '#004008',
+            15: '#cc0000',
+            4: '#240044',
+            13: '#ff2200',
+            9: '#ffff00',
+            10: '#073fe4',
+            2: '#073fe4',
+            5: '#ff2200',
+            7: '#cc0000',
+            12: '#240044'
+        }
+    }
     constructor(renderElement) {
         this.cheatLine = false;
         this.laptopGraphics = false;
@@ -31,10 +51,12 @@ class Game {
 
         this.renderElement = $(renderElement);
         this.camera = new THREE.PerspectiveCamera(45, this.renderElement.width() / this.renderElement.height(), 0.1, 10000);
-        this.camera.position.x = 0.001;
-        this.camera.position.y = 20;
-        this.camera.position.z = 0;
-        this.camera.rotateY(Math.PI / 2);
+        this.camera.position.x = 19.478757450139764;
+        this.camera.position.y = 13.112708652062874;
+        this.camera.position.z = -21.18250850069678;
+        this.camera.rotation._x = -2.4532338955548085;
+        this.camera.rotation._y = 0.6979107790638375;
+        this.camera.rotation._z = 2.6553234469537466;
 
         this.renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -77,7 +99,6 @@ class Game {
             new Ball(this, -1.28, 6.4 + 2.75, 0.3075, true, 12, true)
         ];
         this.balls[0].stoppedRolling = this.whiteStop;
-        this.camera.lookAt(this.balls[0].position);
 
         this.lights = {
             spot: new SpotLight(this.scene, 0, 5, 20, this.balls[0]),
