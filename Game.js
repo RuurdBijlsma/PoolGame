@@ -272,12 +272,13 @@ class Game {
             frontPos = origPos.clone(),
             power = this.power / Game.tps;
         backPos.z -= power * 5;
-        frontPos.z += 2;
+        frontPos.z += 1.8;
 
         let that = this;
         this.animateObject(this.keu.children[0], backPos, 500);
         self.setTimeout(function() {
-            that.animateObject(that.keu.children[0], frontPos, 500);
+            console.log('duration: ',30 / power);
+            let slowTween = that.animateObject(that.keu.children[0], frontPos, 60 / power);
             self.setTimeout(function() {
 
                 let rotation = that.keu.rotation.y;
@@ -293,9 +294,12 @@ class Game {
 
                 that.selectedBall.setSpeed(speed);
 
-                that.animateObject(that.keu.children[0], origPos, 700);
+                self.setTimeout(function(){
+                    slowTween.stop();
+                    that.animateObject(that.keu.children[0], origPos, 500);
+                }, 200);
 
-            }, 300);
+            }, 60 / power / 1.9);
         }, 500);
     }
 
@@ -505,7 +509,7 @@ class Game {
     }
 
     animateObject(object, newPos, time = 1000, target = null, easing = TWEEN.Easing.Quartic.InOut) {
-        new TWEEN.Tween(object.position)
+        return new TWEEN.Tween(object.position)
             .to(newPos, time)
             .onUpdate(function() {
                 object.position.set(this.x, this.y, this.z);
