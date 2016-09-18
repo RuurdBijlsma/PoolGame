@@ -21,8 +21,7 @@ html {
 #renderView{
 	width:100%;
 	position:fixed;
-	top:88px;
-	height:calc(100% - 88px);
+	height:100%;
 }
 h1{
 	margin:0px;
@@ -63,7 +62,6 @@ h1{
 	width:100%;
 	height:88px;
 	color: white;
-	background-color: rgb(30, 111, 42);
 	transform:translateX(0px);
 }
 #player2{
@@ -94,12 +92,37 @@ h1{
 	transform: translateY(-50%);
 }
 .ball{
-	width:78px;
-	height:78px;
-	background-color:red;
-	border-radius:50%;
-	display:inline-block;
-	background-size: cover;
+	width: 60px;
+	height: 60px;
+	background-color: red;
+	border-radius: 50%;
+	display: inline-block;
+	margin-top: 8px;
+	background-size: 350%;
+	background-position: 188px 188px;
+}
+
+@media (max-width:1287px) and (min-height:542px) {
+	#players>div>.name{
+		width:100%;
+	}
+	.balls{
+		position: fixed;
+		height:100%;
+		top:120px;
+		width:60px;
+		margin-left:0px !important;
+		margin-right:0px !important;
+	}
+	#player1 .balls{
+		left:10px;
+	}
+	#player2 .balls{
+		right:10px;
+	}
+	.ball{
+		margin-top:5px;
+	}
 }
 .b1{
 	background-image: url('img/balls/1.png');
@@ -155,10 +178,7 @@ h1{
 }
 #centerball{
 	top:5px;
-	left:calc(50% - 39px);
-	height:78px;
-	width:78px;
-	border-radius:50%;
+	left:calc(50% - 30px);
 	background-color:black;
 	position: fixed;
 }

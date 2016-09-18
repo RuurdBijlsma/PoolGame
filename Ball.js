@@ -75,7 +75,7 @@ class Ball extends THREE.Mesh {
 
             if (direction) {
                 direction.reflect(direction).normalize();
-                if(distance - that.radius < 0){
+                if(distance < 0){
                     that.position.add(direction.clone().multiplyScalar(distance));
                     that.currentPosition = that.position.clone();
                 }
@@ -125,23 +125,23 @@ class Ball extends THREE.Mesh {
         if(this.nextPosition.x > 7.1)
             return {
                 direction: new THREE.Vector3(1, 0, 0),
-                distance: 0
+                distance: 6.7 - this.radius - this.position.x
             };
         if(this.nextPosition.x < -7.1)
             return {
                 direction: new THREE.Vector3(-1, 0, 0),
-                distance: 0
+                distance: -6.7 + this.radius - this.position.x
             };
 
         if(this.nextPosition.z > 13.5)
             return {
                 direction: new THREE.Vector3(0, 0, 1),
-                distance: 0
+                distance: 13.45 - this.radius - this.position.z
             };
         if(this.nextPosition.z < -13.5)
             return {
                 direction: new THREE.Vector3(0, 0, -1),
-                distance: 0
+                distance: -13.45 + this.radius - this.position.z
             };
 
         let pX = this.nextPosition.x > 0, //Bal zit in de positieve X helft

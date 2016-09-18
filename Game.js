@@ -8,6 +8,7 @@
 //Alle ballen toevoegen DONE
 //Scoren toevoegen DONE
 //Regels toevoegen
+//Bij wall collision minder zwaar de ball position terug zetten als hij glitchet
 
 //players toevoegen
     //players beginnen zonder side
@@ -166,36 +167,28 @@ class Game {
         );
 
         let floorTextureLoader = new THREE.TextureLoader(),
-            that = this;
-        floorTextureLoader.load(
-            'img/cloth.jpg',
-            function(texture) {
-                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.set(0.15, 0.15);
+            clothMap = floorTextureLoader.load('img/cloth.jpg'),
+            clothMaterial = new THREE.MeshStandardMaterial(
+                this.laptopGraphics ? {
+                map: clothMap
+            } : {
+                map: clothMap,
+                bumpScale: 0.01,
+                bumpMap: clothMap
+            });
+        clothMap.repeat.set(0.15, 0.15);
+        clothMap.wrapS = clothMap.wrapT = THREE.RepeatWrapping;
 
-                let materialSettings = that.laptopGraphics ? {
-                    map: texture
-                } : {
-                    map: texture,
-                    bumpScale: 0.01,
-                    bumpMap: texture
-                };
-                let floorMaterial = new THREE.MeshStandardMaterial(materialSettings);
-                that.floorMesh = that.shapesToMesh(floorShape, 0.2, floorMaterial);
-                that.floorMesh.position.y = -.2515;
-                that.floorMesh.rotateX(-Math.PI / 2);
-                that.floorMesh.receiveShadow = true;
-                that.scene.add(that.floorMesh);
-                that.camera.lookAt(that.floorMesh.position);
+        this.wallMesh = this.shapesToMesh(this.wallShapes, .5, clothMaterial);
+        this.wallMesh.rotateX(Math.PI / 2);
+        this.wallMesh.receiveShadow = true;
+        this.wallMesh.castShadow = true;
+        this.wallMesh.position.y = .5;
+        this.scene.add(this.wallMesh);
 
-                that.wallMesh = that.shapesToMesh(that.wallShapes, .5, floorMaterial);
-                that.wallMesh.rotateX(Math.PI / 2);
-                that.wallMesh.receiveShadow = true;
-                that.wallMesh.castShadow = true;
-                that.wallMesh.position.y = .5;
-                that.scene.add(that.wallMesh);
-            }
-        );
+        this.floor = new ObjMesh(this.scene, 'obj/table/floor.obj', 'img/cloth.jpg', 2);
+        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg');
+        this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg');
 
         let keuGeometry = new THREE.CylinderGeometry(0.06, 0.1, 15, 32, 32),
             keuMaterial = new THREE.MeshStandardMaterial({ color: 0xfda43a });
@@ -212,8 +205,9 @@ class Game {
         let pos = this.balls[0].position;
         this.keu.position.set(pos.x, pos.y, pos.z);
 
-        this.render(this);
 
+        this.render(this);
+        let that = this;
         this.keyPressed = [];
         $(document).keydown(function(e) {
             that.keydown(e, that);
@@ -361,7 +355,7 @@ class Game {
         let that = this;
         this.placeLoop = that.addLoop(function(){
             that.raycaster.setFromCamera(that.mousePos, that.camera);
-            let intersects = that.raycaster.intersectObjects([that.floorMesh]);
+            let intersects = that.raycaster.intersectObjects([that.floor.mesh]);
 
             if (intersects.length !== 0) {
                 that.placeLocation = intersects[0].point;
@@ -379,7 +373,7 @@ class Game {
         let that = this;
         this.placeLoop = that.addLoop(function(){
             that.raycaster.setFromCamera(that.mousePos, that.camera);
-            let intersects = that.raycaster.intersectObjects([that.floorMesh]);
+            let intersects = that.raycaster.intersectObjects([that.floor.mesh]);
 
             if (intersects.length !== 0) {
                 that.placeLocation = intersects[0].point;
@@ -514,7 +508,7 @@ class Game {
     }
 
     topView() {
-        this.animateObject(this.camera, new THREE.Vector3(0, 20, 0), 300, new THREE.Vector3(0, 0, 0));
+        this.animateObject(this.camera, new THREE.Vector3(0, 25, 0), 300, new THREE.Vector3(0, 0, 0));
     }
     westView() {
         this.animateObject(this.camera, new THREE.Vector3(15, 15, 0), 300, new THREE.Vector3(0, 0, 0));
