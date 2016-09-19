@@ -46,7 +46,9 @@ class Game {
     }
     constructor(renderElement) {
         this.cheatLine = false;
-        this.laptopGraphics = false;
+        if(localStorage.getItem('laptop')===null)
+            localStorage['laptop'] = !confirm('High graphics?');
+        this.laptopGraphics = localStorage['laptop'];
         this.scene = new THREE.Scene();
         // this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
 
@@ -186,9 +188,9 @@ class Game {
         this.wallMesh.position.y = .5;
         this.scene.add(this.wallMesh);
 
-        this.floor = new ObjMesh(this.scene, 'obj/table/floor.obj', 'img/cloth.jpg', 2);
-        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg',10, true, true);
-        this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg',10, true, true);
+        this.floor = new ObjMesh(this.scene, 'obj/table/floor.obj', 'img/cloth.jpg', 2, false, true, !this.laptopGraphics);
+        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg',10, true, true, !this.laptopGraphics);
+        this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg',10, true, true, !this.laptopGraphics);
 
         let keuGeometry = new THREE.CylinderGeometry(0.06, 0.1, 15, 32, 32),
             keuMaterial = new THREE.MeshStandardMaterial({ color: 0xfda43a });
