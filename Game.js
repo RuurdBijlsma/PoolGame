@@ -47,7 +47,7 @@ class Game {
     constructor(renderElement) {
         this.cheatLine = false;
         if(localStorage.getItem('laptop')===null)
-            localStorage['laptop'] = !confirm('High graphics?');
+            localStorage['laptop'] = !confirm('Enable high graphics?');
         this.laptopGraphics = localStorage['laptop'];
         this.scene = new THREE.Scene();
         // this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
