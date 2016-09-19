@@ -1,7 +1,9 @@
 class Ball extends THREE.Mesh {
     constructor(game, x = 0, z = 0, radius = 0.3075, shadow = true, number = 0, stripe = false) {
         let textureLoader = new THREE.TextureLoader();
-        let map = textureLoader.load(`img/balls/${number}.png`);
+        let map = null;
+        if(number!==0)
+            map = textureLoader.load(`img/balls/${number}.png`);
 
         let geometry = new THREE.SphereGeometry(radius, 36, 36),
             material = new THREE.MeshPhongMaterial(number === 0 ? { color: 0xffffff } : {

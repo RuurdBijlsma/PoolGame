@@ -48,7 +48,7 @@ class Game {
         this.cheatLine = false;
         this.laptopGraphics = false;
         this.scene = new THREE.Scene();
-        this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
+        // this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
 
         this.renderElement = $(renderElement);
         this.camera = new THREE.PerspectiveCamera(45, this.renderElement.width() / this.renderElement.height(), 0.1, 10000);
@@ -103,7 +103,7 @@ class Game {
 
         this.lights = {
             spot: new SpotLight(this.scene, 0, 5, 20, this.balls[0]),
-            directional: new DirectionalLight(this.scene, 10, 10, 10, null, true, 0xffffff, 0.6),
+            directional: new DirectionalLight(this.scene, -10, 30, 30, null, true, 0xffffff, 0.6),
             ambient: new AmbientLight(this.scene, 0xffffdd, 0.1)
         };
 
@@ -187,8 +187,8 @@ class Game {
         this.scene.add(this.wallMesh);
 
         this.floor = new ObjMesh(this.scene, 'obj/table/floor.obj', 'img/cloth.jpg', 2);
-        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg');
-        this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg');
+        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg',10, true, true);
+        this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg',10, true, true);
 
         let keuGeometry = new THREE.CylinderGeometry(0.06, 0.1, 15, 32, 32),
             keuMaterial = new THREE.MeshStandardMaterial({ color: 0xfda43a });
@@ -204,6 +204,37 @@ class Game {
         this.scene.add(this.keu);
         let pos = this.balls[0].position;
         this.keu.position.set(pos.x, pos.y, pos.z);
+
+        let floorGeometry = new THREE.PlaneGeometry(70, 150, 0, 0),
+            floorMap = new THREE.TextureLoader().load('img/floorwood.jpg'),
+            floorMaterial = new THREE.MeshPhongMaterial(this.laptopGraphics?{
+                map: floorMap
+            }:{
+                map: floorMap,
+                bumpMap: floorMap,
+                bumpScale: 0.1
+            });
+        floorMap.wrapS = floorMap.wrapT = THREE.RepeatWrapping;
+        floorMap.repeat.set(15, 15);
+
+        this.groundMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+        this.groundMesh.rotateX(-Math.PI/2);
+        this.groundMesh.position.y = -7.788;
+        this.groundMesh.receiveShadow=true;
+        this.scene.add(this.groundMesh);
+
+
+
+        // let hdriLoader = new THREE.TextureLoader(),
+        //     hdriMap = hdriLoader.load('img/hdri4.jpg'),
+        //     hdriMaterial = new THREE.MeshBasicMaterial({
+        //         map: hdriMap,
+        //         side: 1
+        //     }),
+        //     skyGeometry = new THREE.SphereGeometry(1000, 40, 40);
+        // this.sky = new THREE.Mesh(skyGeometry, hdriMaterial);
+        // this.scene.add(this.sky);
+
 
 
         this.render(this);
@@ -247,6 +278,8 @@ class Game {
             color: 0x0000ff
         });
 
+
+        this.skyBox = new SkyBox(this, 'img/spacebox/');
     }
 
     score(number, stripe, scorePocket) {
