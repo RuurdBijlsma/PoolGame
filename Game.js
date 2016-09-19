@@ -1,6 +1,6 @@
 //TODO
-//Gaten mooier maken
-//Rest van tafel maken
+//Gaten mooier maken DONE
+//Rest van tafel maken DONE
 //Physics
 //Keu animatie bij shieten DONE
 //Schieten fixen (hoek soms) DONE
@@ -8,7 +8,7 @@
 //Alle ballen toevoegen DONE
 //Scoren toevoegen DONE
 //Regels toevoegen
-//Bij wall collision minder zwaar de ball position terug zetten als hij glitchet
+//Bij wall collision minder zwaar de ball position terug zetten als hij glitchet DONE
 
 //players toevoegen
     //players beginnen zonder side
@@ -48,7 +48,7 @@ class Game {
         this.cheatLine = false;
         if(localStorage.getItem('laptop')===null)
             localStorage['laptop'] = !confirm('Enable high graphics?');
-        this.laptopGraphics = localStorage['laptop'];
+        this.laptopGraphics = localStorage['laptop'] === 'true';
         this.scene = new THREE.Scene();
         // this.scene.fog = new THREE.FogExp2(0x050423, 0.002);
 
