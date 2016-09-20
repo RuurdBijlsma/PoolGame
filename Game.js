@@ -66,9 +66,9 @@ class Game {
             antialias: true
         });
         this.renderer.shadowMap.enabled = true;
-        if (this.laptopGraphics)
-            this.renderer.shadowMap.type = THREE.BasicShadowMap;
-        else
+        // if (this.laptopGraphics)
+        //     this.renderer.shadowMap.type = THREE.BasicShadowMap;
+        // else
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
@@ -184,13 +184,13 @@ class Game {
         this.wallMesh = this.shapesToMesh(this.wallShapes, .5, clothMaterial);
         this.wallMesh.rotateX(Math.PI / 2);
         this.wallMesh.receiveShadow = true;
-        this.wallMesh.castShadow = true;
+        this.wallMesh.castShadow = !this.laptopGraphics;
         this.wallMesh.position.y = .5;
         this.scene.add(this.wallMesh);
 
         this.floor = new ObjMesh(this.scene, 'obj/table/floor.obj', 'img/cloth.jpg', 2, false, true, !this.laptopGraphics);
-        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg',10, true, true, !this.laptopGraphics);
-        this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg',10, true, true, !this.laptopGraphics);
+        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg',10, true, this.laptopGraphics, !this.laptopGraphics);
+        this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg',10, !this.laptopGraphics, true, !this.laptopGraphics);
 
         let keuGeometry = new THREE.CylinderGeometry(0.06, 0.1, 15, 32, 32),
             keuMaterial = new THREE.MeshStandardMaterial({ color: 0xfda43a });
@@ -200,7 +200,7 @@ class Game {
         keuMesh.rotateX(Math.PI / 2);
         keuMesh.position.z -= 8.5;
         keuMesh.rotateX(0.1);
-        keuMesh.castShadow = true;
+        keuMesh.castShadow = !this.laptopGraphics;
         this.keu = new THREE.Group();
         this.keu.add(keuMesh);
         this.scene.add(this.keu);
