@@ -66,9 +66,9 @@ class Game {
             antialias: true
         });
         this.renderer.shadowMap.enabled = true;
-        // if (this.laptopGraphics)
-        //     this.renderer.shadowMap.type = THREE.BasicShadowMap;
-        // else
+        if (this.laptopGraphics)
+            this.renderer.shadowMap.type = THREE.BasicShadowMap;
+        else
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
