@@ -10,6 +10,7 @@ class SpotLight extends THREE.SpotLight {
         if (shadow) {
             this.castShadow = true;
             this.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(80, 1, 1, 2500));
+            this.shadow.bias = 0.001;
         }
 
         this.target = target;
@@ -26,6 +27,7 @@ class DirectionalLight extends THREE.DirectionalLight {
         if (shadow) {
             this.castShadow = true;
             this.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(80, 1, 1, 2500));
+            this.shadow.bias = 0.001;
         }
 
         this.position.set(x, y, z);

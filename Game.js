@@ -189,7 +189,7 @@ class Game {
         this.scene.add(this.wallMesh);
 
         this.floor = new ObjMesh(this.scene, 'obj/table/floor.obj', 'img/cloth.jpg', 2, false, true, !this.laptopGraphics);
-        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg',10, true, this.laptopGraphics, !this.laptopGraphics);
+        this.tableBase = new ObjMesh(this.scene, 'obj/table/woodwalls.obj', 'img/wood.jpg', 30, true, this.laptopGraphics, !this.laptopGraphics);
         this.tableLegs = new ObjMesh(this.scene, 'obj/table/legs.obj', 'img/wood.jpg',10, !this.laptopGraphics, true, !this.laptopGraphics);
 
         let keuGeometry = new THREE.CylinderGeometry(0.06, 0.1, 15, 32, 32),
