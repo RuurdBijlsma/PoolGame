@@ -31,4 +31,9 @@ function time(fun, trials = 10000000) {
 function newPlayer() {
     let name1 = prompt('Player 1 name?', 'Player 1'),
         name2 = prompt('Player 2 name?', 'Player 2');
+    game.startGame(name1, name2);
+    $('#menu').css('transform','translateX(-250px)');
+    $('#players').css('transform','scale(1) translateY(0px)');
+    $('#gameHider').css('opacity','0');
+    $('#gameHider').css('pointer-events','none');
 }

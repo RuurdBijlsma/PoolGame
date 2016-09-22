@@ -33,10 +33,12 @@ h1{
 	top:0;
 	left:0;
 	height:100%;
-	width:100%;
-	max-width:300px;
+	width:250px;
+	position: fixed;
 	background-color:rgba(255,255,255,0.8);
-	transform:translateX(-237.48px);
+	transition:.4s;
+	z-index: 1;
+	/*transform:translateX(-237.48px);*/
 }
 .menuItem{
 	cursor:pointer;
@@ -55,6 +57,15 @@ h1{
 	position:fixed;
 	height:100%;
 }
+#gameHider{
+	transition:0.4s;
+	width:100%;
+	height:100%;
+	position: fixed;
+	top:0;
+	left:0;
+	background-color:black;
+}
 #players{
 	position: fixed;
 	top:0px;
@@ -62,9 +73,11 @@ h1{
 	width:100%;
 	height:88px;
 	color: white;
-	transform:translateX(0px);
+	transform-origin: center;
+	transform:scale(10) translateY(100px);
+	transition:.4s;
 }
-#player2{
+#stripeBalls{
 	transform:translateX(78px)
 }
 #players>div:not(:first-child) {
@@ -84,7 +97,7 @@ h1{
 	display: inline-block;
 	width: 150px;
 }
-#player2{
+#stripeBalls{
 	text-align: right !important;
 }
 .balls {
@@ -92,11 +105,11 @@ h1{
 	transform: translateY(-50%);
 }
 .ball{
+	display:none;
 	width: 60px;
 	height: 60px;
 	background-color: red;
 	border-radius: 50%;
-	display: inline-block;
 	margin-top: 8px;
 	background-size: 350%;
 	background-position: 188px 188px;
@@ -114,10 +127,10 @@ h1{
 		margin-left:0px !important;
 		margin-right:0px !important;
 	}
-	#player1 .balls{
+	#fullBalls .balls{
 		left:10px;
 	}
-	#player2 .balls{
+	#stripeBalls .balls{
 		right:10px;
 	}
 	.ball{
@@ -170,10 +183,10 @@ h1{
 	background-image: url('img/balls/15.png');
 }
 
-#player1 .balls{
+#fullBalls .balls{
 	margin-left:150px;
 }
-#player2 .balls{
+#stripeBalls .balls{
 	margin-right:150px;
 }
 #centerball{

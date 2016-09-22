@@ -24,6 +24,12 @@ class Game {
             x: 13.5
         }
     }
+    static get balls(){
+        return {
+            stripe: [9, 10, 11, 12, 13, 14, 15],
+            full: [1, 2, 3, 4, 5, 6, 7]
+        }
+    }
     static get ballColors() {
         return {
             0: '#ffffff',
@@ -207,6 +213,9 @@ class Game {
         let pos = this.balls[0].position;
         this.keu.position.set(pos.x, pos.y, pos.z);
 
+        let randoStartRotation = 0.1;
+        this.keu.rotateY(randoStartRotation/2 - Math.random()*randoStartRotation);
+
         let floorGeometry = new THREE.PlaneGeometry(70, 150, 0, 0),
             floorMap = new THREE.TextureLoader().load('img/floorwood.jpg'),
             floorMaterial = new THREE.MeshPhongMaterial(this.laptopGraphics?{
@@ -238,8 +247,6 @@ class Game {
         // this.scene.add(this.sky);
 
 
-
-        this.render(this);
         let that = this;
         this.keyPressed = [];
         $(document).keydown(function(e) {
@@ -280,15 +287,25 @@ class Game {
             color: 0x0000ff
         });
 
+        this.players = [];
+        this.currentPlayer = -1;
 
         this.skyBox = new SkyBox(this, 'img/spacebox/');
+        this.render(this);
     }
 
-    score(number, stripe, scorePocket) {
+    startGame(player1, player2){
+        this.players = [new Player(player1, 1, this), new Player(player2, 0, this)];
+        this.currentPlayer=Math.random()>0.5?0:1;
+        alert(this.players[this.currentPlayer].name+' starts the game');
+    }
+
+    score(number, pocket) {
         if (number === 0)
             this.freePlace(this.balls.filter((ball)=>ball.number===0)[0]);
-        else
-            console.log(`ball ${number} scored a point for ${stripe?'streep':'niet-streep'} in pocket ${scorePocket}`);
+        else{
+            this.players[this.currentPlayer].addPoint(number, pocket);
+        }
     }
 
     pointsToShape(...points) {

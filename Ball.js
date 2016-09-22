@@ -109,7 +109,7 @@ class Ball extends THREE.Mesh {
             if (scorePocket) {
                 that.speed.set(0, 0, 0);
                 that.ballLoop = that.game.removeLoop(that.ballLoop);
-                game.score(that.number, that.stripe, scorePocket);
+                that.game.score(that.number, scorePocket);
                 let downPos = that.position.clone();
                 downPos.y -= 3;
                 that.game.animateObject(that, downPos, 500);
