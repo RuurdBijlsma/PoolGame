@@ -5,12 +5,14 @@ class Player{
         this.remainingBalls = 'all';
         this.eightBallPocket = -1;
         this.getOpponent = () => game.players[opponent];
+        this.hasFoul = null;
+        this.game=game;
     }
-    addPoint(number, pocket){
+    addPoint(number, pocket, side){
         if(number===8 && this.remainingBalls.length>0){
-            alert(this.name + ' loser');
+            this.game.msg(this.name + ' loser');
         }else if(pocket === this.eightBallPocket){
-            alert(this.name + ' winner');
+            this.game.msg(this.name + ' winner');
         }
         if(!this.side){
             for(let side in Game.balls)
@@ -24,6 +26,12 @@ class Player{
             $('#'+this.side+'Balls .name').text(this.name);
             $('#'+this.getOpponent().side+'Balls .name').text(this.getOpponent().name);
             this.remainingBalls = Game.balls[this.side];
+        }
+        if(side === this.side){
+            if(this.hasFoul===null)
+                this.hasFoul=false;
+        }else{
+            this.hasFoul=true;
         }
         $('.b'+number).css('display','none');
         this.remainingBalls = this.remainingBalls.filter((ballNumber)=>ballNumber!==number);

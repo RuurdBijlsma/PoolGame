@@ -90,26 +90,26 @@ class Ball extends THREE.Mesh {
             }
 
             let scorePocket = false;
-            if (that.position.x > 6.2 && that.position.z > 13.2)
+            if (that.position.x > 6 && that.position.z > 13)
                 scorePocket = 1;
-            if (that.position.x < -6.2 && that.position.z > 13.2)
+            if (that.position.x < -6 && that.position.z > 13)
                 scorePocket = 2;
 
-            if (that.position.x < -7.25 && that.position.z < 0.7 && that.position.z > -0.7)
+            if (that.position.x < -7.1 && that.position.z < 1 && that.position.z > -1)
                 scorePocket = 3;
 
-            if (that.position.x < -6.2 && that.position.z < -13.2)
+            if (that.position.x < -6 && that.position.z < -13)
                 scorePocket = 4;
-            if (that.position.x > 6.2 && that.position.z < -13.2)
+            if (that.position.x > 6 && that.position.z < -13)
                 scorePocket = 5;
 
-            if (that.position.x > 7.25 && that.position.z < 0.7 && that.position.z > -0.7)
+            if (that.position.x > 7.1 && that.position.z < 1 && that.position.z > -1)
                 scorePocket = 6;
 
             if (scorePocket) {
                 that.speed.set(0, 0, 0);
                 that.ballLoop = that.game.removeLoop(that.ballLoop);
-                that.game.score(that.number, scorePocket);
+                that.game.score(that.number, scorePocket, that.stripe);
                 let downPos = that.position.clone();
                 downPos.y -= 3;
                 that.game.animateObject(that, downPos, 500);

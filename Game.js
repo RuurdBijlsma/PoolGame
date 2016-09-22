@@ -297,14 +297,16 @@ class Game {
     startGame(player1, player2){
         this.players = [new Player(player1, 1, this), new Player(player2, 0, this)];
         this.currentPlayer=Math.random()>0.5?0:1;
-        alert(this.players[this.currentPlayer].name+' starts the game');
+        this.msg(this.players[this.currentPlayer].name+' starts the game');
     }
 
-    score(number, pocket) {
-        if (number === 0)
+    score(number, pocket, stripe) {
+        if (number === 0){
             this.freePlace(this.balls.filter((ball)=>ball.number===0)[0]);
+            this.switchPlayers();
+        }
         else{
-            this.players[this.currentPlayer].addPoint(number, pocket);
+            this.players[this.currentPlayer].addPoint(number, pocket, stripe?'stripe':'full');
         }
     }
 
@@ -401,6 +403,17 @@ class Game {
 
     whiteStop(game) {
         game.animateObject(game.keu, this.position, 1000);
+        //check fouls
+        let foul = game.players[game.currentPlayer].hasFoul;
+        if (foul===true || foul===null)
+            game.switchPlayers();
+    }
+
+    switchPlayers(){
+        this.currentPlayer = (this.currentPlayer+1)%2;
+        for(let player of this.players)
+            player.hasFoul = null;
+        this.msg('foul! '+this.players[this.currentPlayer].name+"'s turn");
     }
 
     linePlace(ball, line = -6.75){
@@ -596,5 +609,16 @@ class Game {
         // if(!that.laptopGraphics)
         //     for (let ball of that.balls)
         //         ball.cubeCamera.update(that.renderer, that.scene);
+    }
+
+    msg(string){
+        let msgBox = $('#messageBox');
+        msgBox.text(string);
+        msgBox.css('transform','translateY(0px)');
+        if(this.msgTimeout)
+            clearTimeout(this.msgTimeout);
+        this.msgTimeout = self.setTimeout(function(){
+            msgBox.css('transform','translateY(100px)');
+        }, 3000 + string.length*100);
     }
 }

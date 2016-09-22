@@ -27,6 +27,24 @@ h1{
 	margin:0px;
 	padding:20px;
 }
+#messageBox {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	animation-name: rainbowBg;
+	animation-duration: 7s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-delay: -4s;
+	height: 20px;
+	padding: 20px;
+	text-align: center;
+	color: white;
+	font-weight:bolder;
+	transform:translateY(60px);
+	transition:0.3s;
+}
 #menu{
 	font-size:20px;
 	color:rgba(0,0,0,0.9);
