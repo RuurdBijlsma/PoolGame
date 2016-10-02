@@ -2,7 +2,7 @@ class Ball extends THREE.Mesh {
     constructor(game, x = 0, z = 0, radius = 0.3075, shadow = true, number = 0, stripe = false) {
         let textureLoader = new THREE.TextureLoader();
         let map = null;
-        if(number!==0)
+        if (number !== 0)
             map = textureLoader.load(`img/balls/${number}.png`);
 
         let geometry = new THREE.SphereGeometry(radius, 36, 36),
@@ -18,7 +18,7 @@ class Ball extends THREE.Mesh {
         this.position.set(x, radius, z);
         this.castShadow = shadow;
         this.mass = 1;
-        this.restitution = 0.8;
+        this.restitution = .9;
         this.number = number;
         this.currentRotation = 0;
         game.scene.add(this);
@@ -77,7 +77,7 @@ class Ball extends THREE.Mesh {
 
             if (direction) {
                 direction.reflect(direction).normalize();
-                if(distance < 0){
+                if (distance < 0) {
                     that.position.add(direction.clone().multiplyScalar(distance));
                     that.currentPosition = that.position.clone();
                 }
@@ -86,7 +86,7 @@ class Ball extends THREE.Mesh {
                 let outgoingVector = ((d, n) => d.sub(n.multiplyScalar(d.dot(n) * 2))),
                     outgoing = outgoingVector(speed.clone(), direction);
 
-                that.speed = outgoing.clone();
+                that.speed = outgoing.clone().multiplyScalar(that.restitution);
             }
 
             let scorePocket = false;
@@ -124,23 +124,23 @@ class Ball extends THREE.Mesh {
         if (Game.tableSize.x / 2 - Math.abs(this.nextPosition.x) > 4 && Game.tableSize.z / 2 - Math.abs(this.nextPosition.z) > 4)
             return false;
 
-        if(this.nextPosition.x > 7.1)
+        if (this.nextPosition.x > 7.1)
             return {
                 direction: new THREE.Vector3(1, 0, 0),
                 distance: 6.7 - this.radius - this.position.x
             };
-        if(this.nextPosition.x < -7.1)
+        if (this.nextPosition.x < -7.1)
             return {
                 direction: new THREE.Vector3(-1, 0, 0),
                 distance: -6.7 + this.radius - this.position.x
             };
 
-        if(this.nextPosition.z > 13.5)
+        if (this.nextPosition.z > 13.5)
             return {
                 direction: new THREE.Vector3(0, 0, 1),
                 distance: 13.45 - this.radius - this.position.z
             };
-        if(this.nextPosition.z < -13.5)
+        if (this.nextPosition.z < -13.5)
             return {
                 direction: new THREE.Vector3(0, 0, -1),
                 distance: -13.45 + this.radius - this.position.z
@@ -204,13 +204,13 @@ class Ball extends THREE.Mesh {
         let outgoingVector = ((d, n) => d.sub(n.multiplyScalar(d.dot(n) * 2))),
             outgoing = outgoingVector(this.speed.clone(), direction);
 
-        if(this.speed.length() < 0.001){
+        if (this.speed.length() < 0.001) {
             let moveOut = direction.clone();
             moveOut.normalize();
             this.position.add(moveOut.multiplyScalar(ball.position.distanceTo(this.position) - ball.radius - this.radius))
-        }else{
+        } else {
             this.setSpeed(outgoing.clone());
-            ball.setSpeed(direction.normalize().multiplyScalar(this.speed.length()));
+            ball.setSpeed(direction.normalize().multiplyScalar(this.speed.length() * this.restitution));
         }
     }
 }
