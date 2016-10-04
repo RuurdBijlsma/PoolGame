@@ -18,7 +18,7 @@ class Ball extends THREE.Mesh {
         this.position.set(x, radius, z);
         this.castShadow = shadow;
         this.mass = 1;
-        this.restitution = .9;
+        this.restitution = .95;
         this.number = number;
         this.currentRotation = 0;
         game.scene.add(this);
