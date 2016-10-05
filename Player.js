@@ -1,20 +1,17 @@
 class Player {
-    constructor(name, opponent, game) {
+    constructor(name, opponent) {
         this.name = name;
         this.side = false;
         this.remainingBalls = 'all';
         this.eightBallPocket = -1;
         this.getOpponent = () => MAIN.game.players[opponent];
         this.hasFoul = null;
-        this.game = game;
     }
     addPoint(number, pocket, side) {
         if (number === 8 && (this.remainingBalls.length > 0 || pocket !== this.eightBallPocket)) {
-            MAIN.msg(this.name + ' loser');
-            alert(this.name + 'Lost, you pocketed the black ball too early, or it went in the wrong pocket.');
+            this.getOpponent().win();
         } else if (pocket === this.eightBallPocket) {
-            MAIN.msg(this.name + ' winner');
-            alert(this.name+'Wins');
+            this.win();
         }
         if (!this.side) {
             for (let side in Game.balls)
@@ -39,5 +36,24 @@ class Player {
         this.remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
         this.getOpponent().remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
         this.eightBallPocket = (pocket + 3) % 6;
+    }
+
+    win(){
+        MAIN.msg(this.name + ' winner');
+
+        let winnerElement = document.getElementById('imwinner');
+        winnerElement.style.transform = 'scale(0.8)';
+        winnerElement.style.opacity = 1;
+
+        let player = this;
+        MAIN.game.getWinnerImage(this.name).then(function(url){
+            winnerElement.style.backgroundImage = 'url('+url+')';
+            setTimeout(function(){
+                if(confirm('Print your achievement?')){
+                    window.open(url).print();
+                    MAIN.game.saveImage(url, player.name);
+                }
+            }, 300);
+        });
     }
 }
