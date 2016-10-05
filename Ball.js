@@ -1,9 +1,9 @@
 class Ball extends THREE.Mesh {
-    constructor(game, x = 0, z = 0, radius = 0.3075, shadow = true, number = 0, stripe = false) {
+    constructor(x = 0, z = 0, radius = 0.3075, shadow = true, number = 0, stripe = false) {
         let textureLoader = new THREE.TextureLoader();
         let map = null;
         if (number !== 0)
-            map = textureLoader.load(`img/balls/${number}.png`);
+            map = textureLoader.load(`img/textures/balls/${number}.png`);
 
         let geometry = new THREE.SphereGeometry(radius, 36, 36),
             material = new THREE.MeshPhongMaterial(number === 0 ? { color: 0xffffff } : {
@@ -21,20 +21,19 @@ class Ball extends THREE.Mesh {
         this.restitution = .95;
         this.number = number;
         this.currentRotation = 0;
-        game.scene.add(this);
+        MAIN.scene.add(this);
 
         //reflectivity
         // this.cubeCamera = new THREEx.CubeCamera(this);
-        // game.scene.add(this.cubeCamera.object3d);
+        // MAIN.game.scene.add(this.cubeCamera.object3d);
         // this.material.envMap = this.cubeCamera.textureCube;
         // this.material.reflectivity = 0.7;
 
         this.nextPosition = this.position;
         this.speed = new THREE.Vector3();
         this.rollFriction = 1;
-        this.getOtherBalls = () => game.balls.filter((ball) => ball !== this);
+        this.getOtherBalls = () => MAIN.game.balls.filter((ball) => ball !== this);
         this.otherBalls = false;
-        this.game = game;
         this.stoppedRolling = function() {};
     }
     setSpeed(speed) {
@@ -44,18 +43,18 @@ class Ball extends THREE.Mesh {
         this.speed = speed;
         this.nextPosition = this.position.clone().addVectors(this.speed, this.position);
         if (!this.ballLoop) {
-            this.ballLoop = that.game.addLoop(function() {
+            this.ballLoop = MAIN.loop.add(function() {
                 that.moveBall(that);
             });
         }
     }
     moveBall(that) {
-        that.speed.multiplyScalar(1 - that.rollFriction / Game.tps);
+        that.speed.multiplyScalar(1 - that.rollFriction / MAIN.loop.tps);
         let stopThreshold = 0.001;
         if (that.speed.length() < stopThreshold) {
             that.speed.set(0, 0, 0);
-            that.stoppedRolling(that.game);
-            that.ballLoop = that.game.removeLoop(that.ballLoop);
+            that.stoppedRolling();
+            that.ballLoop = MAIN.loop.remove(that.ballLoop);
         } else {
             let circumference = that.radius,
                 traversedDistance = that.speed.length(),
@@ -108,11 +107,11 @@ class Ball extends THREE.Mesh {
 
             if (scorePocket) {
                 that.speed.set(0, 0, 0);
-                that.ballLoop = that.game.removeLoop(that.ballLoop);
-                that.game.score(that.number, scorePocket, that.stripe);
+                that.ballLoop = MAIN.loop.remove(that.ballLoop);
+                MAIN.game.score(that.number, scorePocket, that.stripe);
                 let downPos = that.position.clone();
-                downPos.y -= 3;
-                that.game.animateObject(that, downPos, 500);
+                downPos.y -= 1;
+                MAIN.scene.animateObject(that, downPos, 500);
             }
 
             that.position.set(that.currentPosition.x, that.currentPosition.y, that.currentPosition.z);
@@ -173,7 +172,7 @@ class Ball extends THREE.Mesh {
             dir = false;
         for (let direction of directions) {
             ray.ray.direction = direction;
-            let intersects = ray.intersectObjects([this.game.wallMesh]);
+            let intersects = ray.intersectObjects([MAIN.scene.tableWallMesh]);
             if (intersects.length > 0) {
 
                 if (intersects[0].distance < closestWall) {

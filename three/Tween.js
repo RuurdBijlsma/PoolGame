@@ -58,7 +58,6 @@ var TWEEN = TWEEN || (function () {
 				} else {
 					_tweens.splice(i, 1);
 				}
-
 			}
 
 			return true;
@@ -103,7 +102,6 @@ var TWEEN = TWEEN || (function () {
 
 
 TWEEN.Tween = function (object) {
-
 	var _object = object;
 	var _valuesStart = {};
 	var _valuesEnd = {};
@@ -303,6 +301,7 @@ TWEEN.Tween = function (object) {
 		var property;
 		var elapsed;
 		var value;
+
 
 		if (time < _startTime) {
 			return true;

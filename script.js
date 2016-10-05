@@ -1,14 +1,30 @@
-$(document).ready(function() {
-    game = new Game(document.getElementById('renderView'));
-    self.setTimeout(function() {
-        //game.balls[1].setSpeed(new THREE.Vector3(0, 0, -0.1));
+document.addEventListener('DOMContentLoaded', init, false);
+
+function init() {
+    MAIN = new Main(document.getElementById('renderView'));
+}
+
+function newGame() {
+    let name1 = prompt('Player 1 name?', 'Player 1'),
+        name2 = prompt('Player 2 name?', 'Player 2');
+    MAIN.startGame(name1, name2);
+
+    let menu = document.getElementById('menu'),
+        gameHider = document.getElementById('gameHider');
+    players = document.getElementById('players');
+    setTimeout(function() {
+        gameHider.style.opacity = 0;
+        gameHider.style.backgroundColor = 'transparent';
+        gameHider.style.pointerEvents = 'none';
+        players.style.transform = 'scale(1) translateY(0px)';
+    }, 500);
+    setTimeout(function() {
+        menu.style.width = '50%';
+        menu.style.transform = 'translateX(-100%)';
+        menu.style.pointerEvents = 'none';
+        menu.style.opacity = 0;
     }, 1000);
-
-    for(let i=0;i<15;i++){
-
-    }
-});
-
+}
 
 function time(fun, trials = 10000000) {
     let now = performance.now();
@@ -26,14 +42,4 @@ function time(fun, trials = 10000000) {
         unit = 'nanoseconds';
     }
     console.log('average: ', time, unit);
-}
-
-function newPlayer() {
-    let name1 = prompt('Player 1 name?', 'Player 1'),
-        name2 = prompt('Player 2 name?', 'Player 2');
-    game.startGame(name1, name2);
-    $('#menu').css('transform','translateX(-250px)');
-    $('#players').css('transform','scale(1) translateY(0px)');
-    $('#gameHider').css('opacity','0');
-    $('#gameHider').css('pointer-events','none');
 }

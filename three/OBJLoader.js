@@ -299,8 +299,6 @@ THREE.OBJLoader.prototype = {
 
 	parse: function ( text ) {
 
-		console.time( 'OBJLoader' );
-
 		var state = this._createParserState();
 
 		if ( text.indexOf( '\r\n' ) !== - 1 ) {
@@ -554,8 +552,6 @@ THREE.OBJLoader.prototype = {
 			container.add( mesh );
 
 		}
-
-		console.timeEnd( 'OBJLoader' );
 
 		return container;
 
