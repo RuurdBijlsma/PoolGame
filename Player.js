@@ -9,12 +9,12 @@ class Player {
         this.game = game;
     }
     addPoint(number, pocket, side) {
-        if (number === 8 && this.remainingBalls.length > 0) {
+        if (number === 8 && (this.remainingBalls.length > 0 || pocket !== this.eightBallPocket)) {
             MAIN.msg(this.name + ' loser');
-            alert('Loser');
+            alert(this.name + 'Lost, you pocketed the black ball too early, or it went in the wrong pocket.');
         } else if (pocket === this.eightBallPocket) {
             MAIN.msg(this.name + ' winner');
-            alert('Loser');
+            alert(this.name+'Wins');
         }
         if (!this.side) {
             for (let side in Game.balls)
@@ -35,7 +35,7 @@ class Player {
         } else {
             this.hasFoul = true;
         }
-        document.getElementsByClassName('.b' + number)[0].style.display = 'none';
+        document.getElementsByClassName('b' + number)[0].style.display = 'none';
         this.remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
         this.getOpponent().remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
         this.eightBallPocket = (pocket + 3) % 6;

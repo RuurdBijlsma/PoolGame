@@ -2,11 +2,20 @@ document.addEventListener('DOMContentLoaded', init, false);
 
 function init() {
     MAIN = new Main(document.getElementById('renderView'));
+
+    newGame('Ruurd', 'Bijlsma');
+    self.setTimeout(function(){
+        let name = prompt('Your name?');
+        MAIN.game.getWinnerImage(name).then(function(t){
+            console.log(t);
+            MAIN.game.saveImage(t, name);
+        });
+    }, 500);
 }
 
-function newGame() {
-    let name1 = prompt('Player 1 name?', 'Player 1'),
-        name2 = prompt('Player 2 name?', 'Player 2');
+function newGame(n1, n2) {
+    let name1 = n1 || prompt('Player 1 name?', 'Player 1'),
+        name2 = n2 || prompt('Player 2 name?', 'Player 2');
     MAIN.startGame(name1, name2);
 
     let menu = document.getElementById('menu'),

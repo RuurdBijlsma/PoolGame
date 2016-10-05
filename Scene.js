@@ -35,7 +35,7 @@ class Scene extends THREE.Scene {
         this.controls.minDistance = 5;
 
         this.stats = new Stats();
-        this.stats.showPanel(1);
+        this.stats.showPanel();
         document.body.appendChild(this.stats.dom);
 
         this.camera.position.x = 19.478757450139764;
@@ -54,7 +54,7 @@ class Scene extends THREE.Scene {
             ambient: new AmbientLight(this, 0xffffdd, 0.1)
         };
 
-        this.skyBox = new SkyBox(this, 'img/skybox/clouds/');
+        this.skyBox = new SkyBox(this, 'img/skybox/space/');
 
         let clothMap = this.textureLoader.load('img/textures/cloth.jpg'),
             clothMaterial = new THREE.MeshStandardMaterial(
@@ -158,12 +158,12 @@ class Scene extends THREE.Scene {
     }
 
     toggleStats() {
-        if (this.statsOff) {
-            this.statsOff = false;
-            this.stats.setMode(1);
-        } else {
-            this.statsOff = true;
+        if (this.startOn) {
+            this.startOn = false;
             this.stats.setMode();
+        } else {
+            this.startOn = true;
+            this.stats.setMode(1);
         }
     }
 

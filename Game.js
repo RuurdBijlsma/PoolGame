@@ -1,4 +1,7 @@
 class Game {
+    //TODO:
+    //Power meter laten zien
+    //Ballen goed laten vallen
     constructor(player1, player2) {
         this.players = [player1, player2];
         this.cheatLine = false;
@@ -40,8 +43,11 @@ class Game {
 
         this.cuePower = 30;
 
+        this.beurtElement = document.getElementById("beurt");
         this.players = [new Player(player1, 1), new Player(player2, 0)];
-        this.currentPlayer = Math.random() > 0.5 ? 0 : 1;
+        this.currentPlayer = Math.random() > 0.5 ? 0 : 1;;
+        this.beurtElement.innerText = this.players[this.currentPlayer].name;
+
         MAIN.msg(this.players[this.currentPlayer].name + ' starts the game');
 
         this.lineMaterial = new THREE.LineBasicMaterial({
@@ -66,13 +72,15 @@ class Game {
             let powerSpeed = 10 / MAIN.loop.tps;
             powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
             powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-            this.power += powerSpeed;
+            MAIN.game.cuePower += powerSpeed;
+            console.log('power', powerSpeed, MAIN.game.cuePower);
         });
         MAIN.keyHandler.setContinuousKey('ArrowDown', function() {
             let powerSpeed = 10 / MAIN.loop.tps;
             powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
             powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-            this.power -= powerSpeed;
+            MAIN.game.cuePower -= powerSpeed;
+            console.log('power', powerSpeed, MAIN.game.cuePower);
         });
 
         document.addEventListener('mousemove', function(e) {
@@ -81,6 +89,20 @@ class Game {
         document.addEventListener('mousedown', function(e) {
             MAIN.game.mousedown(e);
         }, false);
+    }
+
+    get cuePower() {
+        return this._cuePower;
+    }
+    set cuePower(p) {
+        let maxPower = 0.3075 * MAIN.loop.tps;
+        this._cuePower = p > maxPower ? maxPower : p;
+        this._cuePower = this._cuePower < 0 ? 0 : this._cuePower;
+        MAIN.style = `progress[value]::-webkit-progress-value{
+            background-size: 35px 20px, ${maxPower/this._cuePower*100}% 100%, 100% 100% !important;
+        }`;
+        console.log(p / maxPower * 1000);
+        document.getElementsByTagName('progress')[0].setAttribute('value', this._cuePower / maxPower * 1000);
     }
 
     onLoop() {
@@ -186,15 +208,66 @@ class Game {
         MAIN.scene.animateObject(MAIN.scene.cue, this.position, 1000);
         //check fouls
         let foul = MAIN.game.players[MAIN.game.currentPlayer].hasFoul;
-        if (foul === true || foul === null)
+        console.log('white stop foul; ', foul);
+        if (foul === true || foul === undefined)
             MAIN.game.switchPlayers();
+
+        for (let player of MAIN.game.players)
+            delete player.hasFoul;
     }
 
     switchPlayers() {
+        console.log('players switched');
         this.currentPlayer = (this.currentPlayer + 1) % 2;
-        for (let player of this.players)
-            player.hasFoul = null;
+        this.beurtElement.innerText = this.players[this.currentPlayer].name;
         MAIN.msg('foul! ' + this.players[this.currentPlayer].name + "'s turn");
+    }
+
+    saveImage(url, fileName){
+        let a = document.createElement("a");
+        a.style = "display: none";
+        document.body.appendChild(a);
+
+        a.href = url;
+        a.download = fileName;
+        a.click();
+    }
+
+    getWinnerImage(text) {
+        let winnerImg = document.getElementById('img'),
+            canvasElement = document.createElement('canvas'),
+            context = canvasElement.getContext('2d');
+        canvasElement.setAttribute("id", "winnerCanvas");
+
+        canvasElement.width = winnerImg.width;
+        canvasElement.height = winnerImg.height;
+
+        context.drawImage(winnerImg, 0, 0, 625, 913);
+
+        context.fillStyle = '#aaa';
+        context.font = "30px 'Press Start 2P'";
+        let textSize = context.measureText(text).width;
+
+        if (textSize > 290) {
+            let startText = text.substring(0, Math.round(text.length / 2)),
+                endText = text.substring(startText.length);
+
+            let textSize = context.measureText(startText).width,
+                x = winnerImg.width / 2 - textSize / 2;
+            context.fillText(startText, x, 590);
+
+            textSize = context.measureText(endText).width;
+            x = winnerImg.width / 2 - textSize / 2;
+            context.fillText(endText, x, 630);
+        } else {
+            let x = winnerImg.width / 2 - textSize / 2;
+            context.fillText(text, x, 610);
+        }
+        return new Promise(function(resolve){
+            canvasElement.toBlob(function(b){
+                resolve(URL.createObjectURL(b));
+            });
+        });
     }
 
     linePlace(ball, line = -6.75) {
