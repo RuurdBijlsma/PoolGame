@@ -78,8 +78,12 @@ class Game {
             }, true);
             document.addEventListener('touchend', function(e) {
                 console.log(MAIN.game.tapLength);
-                if (MAIN.game.tapLength < 10)
+                if (MAIN.game.tapLength < 10) {
+                    if (this.placeLoop)
+                        this.placeLoop = MAIN.loop.remove(this.placeLoop);
+
                     MAIN.game.shoot();
+                }
             }, false);
         } else {
             document.addEventListener('mousemove', function(e) {
@@ -198,10 +202,10 @@ class Game {
             for (let i = 0; i < this.balls.length; i++) {
                 let index = intersects.indexOf(this.balls[i]);
                 if (index === -1) {
-                    this.balls[i].material.color.set(0xffffff);
+                    //this.balls[i].material.color.set(0xffffff);
                 } else {
                     this.highlightedBall = this.balls[i];
-                    this.balls[i].material.color.set(0xff00ff);
+                    //this.balls[i].material.color.set(0xff00ff);
                     highLighter = true;
                 }
             }
