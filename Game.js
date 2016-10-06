@@ -146,7 +146,7 @@ class Game {
             MAIN.scene.camera.setRotationFromQuaternion(quaternion);
         } else {
             let a = THREE.Math.degToRad(-e.alpha);
-            MAIN.scene.camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), this.prevAngle - a);
+            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, a, MAIN.scene.camera.rotation._z)
             this.prevAngle = a;
         }
     }
