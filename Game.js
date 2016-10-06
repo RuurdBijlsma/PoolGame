@@ -165,7 +165,7 @@ class Game {
     }
 
     onLoop() {
-        if (!MAIN.game.cameraGyro) {
+        if (!MAIN.game.cameraGyro && MAIN.isMobile) {
             MAIN.scene.camera.position.x = this.balls[0].position.x;
             MAIN.scene.camera.position.z = this.balls[0].position.z;
         }
