@@ -5,12 +5,14 @@ class Player {
         this.remainingBalls = 'all';
         this.eightBallPocket = -1;
         this.getOpponent = () => MAIN.game.players[opponent];
-        this.hasFoul = null;
+        this.hasFoul = undefined;
     }
     addPoint(number, pocket, side) {
         if (number === 8 && (this.remainingBalls.length > 0 || pocket !== this.eightBallPocket)) {
+            console.log('1', number, this.remainingBalls, pocket, this.eightBallPocket);
             this.getOpponent().win();
-        } else if (pocket === this.eightBallPocket) {
+        } else if (pocket === this.eightBallPocket && number==8 && this.remainingBalls.length === 0) {
+            console.log('2', number, this.remainingBalls, pocket, this.eightBallPocket);
             this.win();
         }
         if (!this.side) {
@@ -25,20 +27,23 @@ class Player {
             document.querySelector('#' + this.side + 'Balls .name').innerHTML = this.name;
             document.querySelector('#' + this.getOpponent().side + 'Balls .name').innerHTML = this.getOpponent().name;
             this.remainingBalls = Game.balls[this.side];
+            this.getOpponent().remainingBalls = Game.balls[this.getOpponent().side];
         }
         if (side === this.side) {
-            if (this.hasFoul === null)
+            if (this.hasFoul === undefined) {
                 this.hasFoul = false;
+            }
         } else {
             this.hasFoul = true;
         }
         document.getElementsByClassName('b' + number)[0].style.display = 'none';
         this.remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
-        this.getOpponent().remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
+
+        this.getOpponent().remainingBalls = this.getOpponent().remainingBalls.filter((ballNumber) => ballNumber !== number);
         this.eightBallPocket = (pocket + 3) % 6;
     }
 
-    win(){
+    win() {
         MAIN.msg(this.name + ' winner');
 
         let winnerElement = document.getElementById('imwinner');
@@ -46,10 +51,10 @@ class Player {
         winnerElement.style.opacity = 1;
 
         let player = this;
-        MAIN.game.getWinnerImage(this.name).then(function(url){
-            winnerElement.style.backgroundImage = 'url('+url+')';
-            setTimeout(function(){
-                if(confirm('Print your achievement?')){
+        MAIN.game.getWinnerImage(this.name).then(function(url) {
+            winnerElement.style.backgroundImage = 'url(' + url + ')';
+            setTimeout(function() {
+                if (confirm('Print your achievement?')) {
                     window.open(url).print();
                     MAIN.game.saveImage(url, player.name);
                 }

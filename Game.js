@@ -7,6 +7,8 @@ class Game {
         this.cheatLine = false;
         this.shootingEnabled = true;
 
+        this.hitSound = new FrequencySound('sound/hit.mp3');
+
         this.balls = [
             new Ball(0, -13.5 / 2),
 
@@ -78,10 +80,11 @@ class Game {
                 }
             }, true);
             document.addEventListener('touchend', function(e) {
-                console.log(MAIN.game.tapLength);
                 if (MAIN.game.tapLength < 10) {
-                    if (this.placeLoop)
+                    if (this.placeLoop) {
+                        this.shootingEnabled = true;
                         this.placeLoop = MAIN.loop.remove(this.placeLoop);
+                    }
 
                     MAIN.game.shoot();
                 }
@@ -110,14 +113,12 @@ class Game {
                 powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
                 powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
                 MAIN.game.cuePower += powerSpeed;
-                console.log('power', powerSpeed, MAIN.game.cuePower);
             });
             MAIN.keyHandler.setContinuousKey('ArrowDown', function() {
                 let powerSpeed = 10 / MAIN.loop.tps;
                 powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
                 powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
                 MAIN.game.cuePower -= powerSpeed;
-                console.log('power', powerSpeed, MAIN.game.cuePower);
             });
         }
         this.prevAngle = 0;
@@ -146,7 +147,7 @@ class Game {
             MAIN.scene.camera.setRotationFromQuaternion(quaternion);
         } else {
             let a = THREE.Math.degToRad(e.alpha);
-            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y,a + Math.PI)
+            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, a + Math.PI)
             this.prevAngle = a;
         }
     }
@@ -223,10 +224,19 @@ class Game {
     }
 
     score(number, pocket, stripe) {
+        let game = this;
         if (number === 0) {
-            this.freePlace(this.balls.filter((ball) => ball.number === 0)[0]);
-            this.switchPlayers();
+            let ball = this.balls.find(b => b.number === number);
+            setTimeout(function() {
+                game.freePlace(ball);
+                game.switchPlayers();
+                MAIN.scene.animateScale(ball, { x: 1, y: 1, z: 1 }, 300);
+            }, 500);
         } else {
+            setTimeout(function() {
+                MAIN.scene.remove(game.balls.find(b => b.number === number));
+                game.balls = game.balls.filter(b => b !== number);
+            }, 500);
             this.players[this.currentPlayer].addPoint(number, pocket, stripe ? 'stripe' : 'full');
         }
     }
@@ -260,6 +270,8 @@ class Game {
 
                     that.selectedBall.setSpeed(speed);
 
+                    that.hitSound.play(power / 0.3075)
+
                     self.setTimeout(function() {
                         slowTween.stop();
                         MAIN.scene.animateObject(MAIN.scene.cue.children[0], origPos, 500);
@@ -275,16 +287,15 @@ class Game {
         MAIN.scene.animateObject(MAIN.scene.cue, this.position, 1000);
         //check fouls
         let foul = MAIN.game.players[MAIN.game.currentPlayer].hasFoul;
-        console.log('white stop foul; ', foul);
         if (foul === true || foul === undefined)
             MAIN.game.switchPlayers();
 
-        for (let player of MAIN.game.players)
+        for (let player of MAIN.game.players) {
             delete player.hasFoul;
+        }
     }
 
     switchPlayers() {
-        console.log('players switched');
         this.currentPlayer = (this.currentPlayer + 1) % 2;
         this.beurtElement.innerText = this.players[this.currentPlayer].name;
         MAIN.msg('foul! ' + this.players[this.currentPlayer].name + "'s turn");
@@ -381,14 +392,15 @@ class Game {
     }
 
     mousedown(e) {
-        if (this.placeLoop)
+        if (this.placeLoop) {
+            this.shootingEnabled = true;
             this.placeLoop = MAIN.loop.remove(this.placeLoop);
+        }
 
         if (this.highlightedBall) {
             MAIN.scene.animateObject(MAIN.scene.cue, this.highlightedBall.position, 500);
             this.selectedBall = this.highlightedBall;
             if (e.ctrlKey) {
-                console.log(this.selectedBall.number);
                 this.freePlace(this.selectedBall);
             }
         }

@@ -18,7 +18,7 @@ class Ball extends THREE.Mesh {
         this.position.set(x, radius, z);
         this.castShadow = shadow;
         this.mass = 1;
-        this.restitution = .95;
+        this.restitution = 1;
         this.number = number;
         this.currentRotation = 0;
         MAIN.scene.add(this);
@@ -37,85 +37,93 @@ class Ball extends THREE.Mesh {
         this.stoppedRolling = function() {};
     }
     setSpeed(speed) {
-        if (!this.otherBalls)
-            this.otherBalls = this.getOtherBalls();
-        let that = this;
+        this.otherBalls = this.getOtherBalls();
+
+        let ball = this;
         this.speed = speed;
         this.nextPosition = this.position.clone().addVectors(this.speed, this.position);
         if (!this.ballLoop) {
             this.ballLoop = MAIN.loop.add(function() {
-                that.moveBall(that);
+                ball.moveBall();
             });
         }
     }
-    moveBall(that) {
-        that.speed.multiplyScalar(1 - that.rollFriction / MAIN.loop.tps);
+    moveBall() {
+        this.speed.multiplyScalar(1 - this.rollFriction / MAIN.loop.tps);
         let stopThreshold = 0.001;
-        if (that.speed.length() < stopThreshold) {
-            that.speed.set(0, 0, 0);
-            that.stoppedRolling();
-            that.ballLoop = MAIN.loop.remove(that.ballLoop);
+        if (this.speed.length() < stopThreshold) {
+            this.speed.set(0, 0, 0);
+            this.stoppedRolling();
+            this.ballLoop = MAIN.loop.remove(this.ballLoop);
         } else {
-            let circumference = that.radius,
-                traversedDistance = that.speed.length(),
+            let circumference = this.radius,
+                traversedDistance = this.speed.length(),
                 addedAngle = traversedDistance / circumference,
-                rollDirection = that.speed.clone().normalize(),
+                rollDirection = this.speed.clone().normalize(),
                 rotateAxis = new THREE.Vector3(0, 1, 0);
             rollDirection.applyAxisAngle(rotateAxis, Math.PI / 2);
 
-            that.currentRotation += addedAngle;
-            let quaternion = new THREE.Quaternion().setFromAxisAngle(rollDirection, that.currentRotation);
-            that.setRotationFromQuaternion(quaternion);
+            this.currentRotation += addedAngle;
+            let quaternion = new THREE.Quaternion().setFromAxisAngle(rollDirection, this.currentRotation);
+            this.setRotationFromQuaternion(quaternion);
 
 
-            that.currentPosition = that.nextPosition.clone();
+            this.currentPosition = this.nextPosition.clone();
 
-            let collision = that.willCollideWall(),
+            let collision = this.willCollideWall(),
                 direction = collision.direction,
                 distance = collision.distance;
 
-            if (direction) {
-                direction.reflect(direction).normalize();
-                if (distance < 0) {
-                    that.position.add(direction.clone().multiplyScalar(distance));
-                    that.currentPosition = that.position.clone();
+            if (direction) { //Wallhit
+                let speedTowardsTarget = this.speed.clone().multiply(direction),
+                    speedLength = speedTowardsTarget.length();
+                if (speedLength > 0.05) {
+                    console.log(speedLength);
+                    let frequency = 2 * this.speed.length();
+                    frequency = frequency > 0.6 ? 0.6 : frequency;
+                    MAIN.game.hitSound.play(frequency);
                 }
-                let speed = that.speed;
+                direction.reflect(direction).normalize();
+                if (distance - this.radius < 0) {
+                    this.position.add(direction.clone().multiplyScalar(distance - this.radius));
+                }
+                let speed = this.speed;
 
                 let outgoingVector = ((d, n) => d.sub(n.multiplyScalar(d.dot(n) * 2))),
                     outgoing = outgoingVector(speed.clone(), direction);
 
-                that.speed = outgoing.clone().multiplyScalar(that.restitution);
+                this.speed = outgoing.clone().multiplyScalar(this.restitution);
             }
 
             let scorePocket = false;
-            if (that.position.x > 6 && that.position.z > 13)
+            if (this.position.x > 6 && this.position.z > 13)
                 scorePocket = 1;
-            if (that.position.x < -6 && that.position.z > 13)
+            if (this.position.x < -6 && this.position.z > 13)
                 scorePocket = 2;
 
-            if (that.position.x < -7.1 && that.position.z < 1 && that.position.z > -1)
+            if (this.position.x < -7.1 && this.position.z < 1 && this.position.z > -1)
                 scorePocket = 3;
 
-            if (that.position.x < -6 && that.position.z < -13)
+            if (this.position.x < -6 && this.position.z < -13)
                 scorePocket = 4;
-            if (that.position.x > 6 && that.position.z < -13)
+            if (this.position.x > 6 && this.position.z < -13)
                 scorePocket = 5;
 
-            if (that.position.x > 7.1 && that.position.z < 1 && that.position.z > -1)
+            if (this.position.x > 7.1 && this.position.z < 1 && this.position.z > -1)
                 scorePocket = 6;
 
             if (scorePocket) {
-                that.speed.set(0, 0, 0);
-                that.ballLoop = MAIN.loop.remove(that.ballLoop);
-                MAIN.game.score(that.number, scorePocket, that.stripe);
-                let downPos = that.position.clone();
+                this.speed.set(0, 0, 0);
+                this.ballLoop = MAIN.loop.remove(this.ballLoop);
+                MAIN.game.score(this.number, scorePocket, this.stripe);
+                let downPos = this.position.clone();
                 downPos.y -= 0.9;
-                MAIN.scene.animateObject(that, downPos, 500);
+                MAIN.scene.animateObject(this, downPos, 500);
+                MAIN.scene.animateScale(this, { x: 0.1, y: 0.1, z: 0.1 }, 500);
             }
 
-            that.position.set(that.currentPosition.x, that.currentPosition.y, that.currentPosition.z);
-            that.nextPosition = that.currentPosition.addVectors(that.speed, that.position);
+            this.position.set(this.currentPosition.x, this.currentPosition.y, this.currentPosition.z);
+            this.nextPosition = this.currentPosition.addVectors(this.speed, this.position);
         }
     }
 
@@ -197,7 +205,17 @@ class Ball extends THREE.Mesh {
         let distance = this.nextPosition.distanceTo(ball.nextPosition);
         return distance < ball.radius + this.radius;
     }
+    playSound(ball) {
+        let hitSpeed = ball.speed.clone().sub(this.speed);
+        hitSpeed.x = Math.abs(hitSpeed.x);
+        hitSpeed.y = Math.abs(hitSpeed.y);
+        hitSpeed.z = Math.abs(hitSpeed.z);
+        let frequency = 0.3 + (hitSpeed.length() / 0.3 * (0.75 + Math.random() / 2)) / 1.5;
+        MAIN.game.hitSound.play(frequency);
+    }
     resolveCollision(ball) {
+        this.playSound(ball);
+
         let direction = this.directionTo(ball);
         direction.normalize();
         let outgoingVector = ((d, n) => d.sub(n.multiplyScalar(d.dot(n) * 2))),

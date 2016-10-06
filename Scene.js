@@ -205,6 +205,20 @@ class Scene extends THREE.Scene {
             .start();
     }
 
+    animateScale(object, newPos, time = 1000, target = null, easing = TWEEN.Easing.Quartic.InOut) {
+        let updater = self.setInterval(TWEEN.update);
+        return new TWEEN.Tween(object.scale)
+            .to(newPos, time)
+            .onUpdate(function() {
+                object.scale.set(this.x, this.y, this.z);
+            })
+            .onComplete(function() {
+                clearInterval(updater);
+            })
+            .easing(easing)
+            .start();
+    }
+
     pointsToShape(...points) {
         points.reverse();
         return new THREE.Shape(points);
