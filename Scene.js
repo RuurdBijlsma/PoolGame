@@ -17,7 +17,7 @@ class Scene extends THREE.Scene {
             antialias: true
         });
 
-        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.enabled = !main.isMobile;
         this.renderer.shadowMap.type = this.laptopGraphics ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
@@ -29,21 +29,20 @@ class Scene extends THREE.Scene {
             scene.onWindowResize();
         }, false);
 
-        this.controls = new THREE.OrbitControls(this.camera, renderElement);
-        this.controls.maxPolarAngle = Math.PI / 2 - 0.01;
-        this.controls.maxDistance = 100;
-        this.controls.minDistance = 5;
+        if(!main.isMobile){
+            this.controls = new THREE.OrbitControls(this.camera, renderElement);
+            this.controls.maxPolarAngle = Math.PI / 2 - 0.01;
+            this.controls.maxDistance = 100;
+            this.controls.minDistance = 5;
+        }
 
         this.stats = new Stats();
         this.stats.showPanel();
         document.body.appendChild(this.stats.dom);
 
-        this.camera.position.x = 19.478757450139764;
-        this.camera.position.y = 13.112708652062874;
-        this.camera.position.z = -21.18250850069678;
-        this.camera.rotation._x = -2.4532338955548085;
-        this.camera.rotation._y = 0.6979107790638375;
-        this.camera.rotation._z = 2.6553234469537466;
+        this.camera.position.x = 0.001;
+        this.camera.position.y = 50;
+        this.camera.position.z = 0;
         this.camera.lookAt(new THREE.Vector3);
 
         this.textureLoader = new THREE.TextureLoader();

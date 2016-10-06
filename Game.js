@@ -5,6 +5,7 @@ class Game {
     constructor(player1, player2) {
         this.players = [player1, player2];
         this.cheatLine = false;
+        this.shootingEnabled = true;
 
         this.balls = [
             new Ball(0, -13.5 / 2),
@@ -56,39 +57,89 @@ class Game {
 
         this.gameLoop = MAIN.loop.add(function() { MAIN.game.onLoop() });
 
-        MAIN.keyHandler.setContinuousKey('ArrowLeft', function() {
-            let rotateSpeed = 3 / MAIN.loop.tps;
-            rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
-            rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-            MAIN.scene.cue.rotateY(rotateSpeed);
-        });
-        MAIN.keyHandler.setContinuousKey('ArrowRight', function() {
-            let rotateSpeed = 3 / MAIN.loop.tps;
-            rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
-            rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-            MAIN.scene.cue.rotateY(-rotateSpeed);
-        });
-        MAIN.keyHandler.setContinuousKey('ArrowUp', function() {
-            let powerSpeed = 10 / MAIN.loop.tps;
-            powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
-            powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-            MAIN.game.cuePower += powerSpeed;
-            console.log('power', powerSpeed, MAIN.game.cuePower);
-        });
-        MAIN.keyHandler.setContinuousKey('ArrowDown', function() {
-            let powerSpeed = 10 / MAIN.loop.tps;
-            powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
-            powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-            MAIN.game.cuePower -= powerSpeed;
-            console.log('power', powerSpeed, MAIN.game.cuePower);
-        });
+        if (MAIN.isMobile) {
+            window.addEventListener("deviceorientation", function(e) {
+                MAIN.game.orientation(e);
+            }, false);
+            document.addEventListener('touchstart', function(e) {
+                MAIN.game.tapLength = 0;
+                MAIN.game.tapStart = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
+            }, false);
+            document.addEventListener('touchmove', function(e) {
+                let tap = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
 
-        document.addEventListener('mousemove', function(e) {
-            MAIN.game.mousemove(e);
-        }, false);
-        document.addEventListener('mousedown', function(e) {
-            MAIN.game.mousedown(e);
-        }, false);
+                if (MAIN.game.tapLength > 10) {
+                    let horizontalLength = tap.x / window.innerWidth,
+                        maxPower = 0.3075 * MAIN.loop.tps;
+                    MAIN.game.cuePower = horizontalLength * maxPower;
+                } else {
+                    MAIN.game.tapLength = tap.distanceTo(MAIN.game.tapStart);
+                }
+            }, true);
+            document.addEventListener('touchend', function(e) {
+                console.log(MAIN.game.tapLength);
+                if (MAIN.game.tapLength < 10)
+                    MAIN.game.shoot();
+            }, false);
+        } else {
+            document.addEventListener('mousemove', function(e) {
+                MAIN.game.mousemove(e);
+            }, false);
+            document.addEventListener('mousedown', function(e) {
+                MAIN.game.mousedown(e);
+            }, false);
+            MAIN.keyHandler.setContinuousKey('ArrowLeft', function() {
+                let rotateSpeed = 3 / MAIN.loop.tps;
+                rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
+                rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+                MAIN.scene.cue.rotateY(rotateSpeed);
+            });
+            MAIN.keyHandler.setContinuousKey('ArrowRight', function() {
+                let rotateSpeed = 3 / MAIN.loop.tps;
+                rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
+                rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+                MAIN.scene.cue.rotateY(-rotateSpeed);
+            });
+            MAIN.keyHandler.setContinuousKey('ArrowUp', function() {
+                let powerSpeed = 10 / MAIN.loop.tps;
+                powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
+                powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+                MAIN.game.cuePower += powerSpeed;
+                console.log('power', powerSpeed, MAIN.game.cuePower);
+            });
+            MAIN.keyHandler.setContinuousKey('ArrowDown', function() {
+                let powerSpeed = 10 / MAIN.loop.tps;
+                powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
+                powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+                MAIN.game.cuePower -= powerSpeed;
+                console.log('power', powerSpeed, MAIN.game.cuePower);
+            });
+        }
+    }
+
+    orientation(e) {
+        let cueRotation = THREE.Math.degToRad(e.alpha);
+
+        let quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), cueRotation);
+        MAIN.scene.cue.setRotationFromQuaternion(quaternion);
+
+
+        let a = THREE.Math.degToRad(e.alpha),
+            b = THREE.Math.degToRad(e.beta),
+            c = THREE.Math.degToRad(e.gamma);
+
+        console.log(e);
+
+        quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+
+        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2));
+
+        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), b));
+
+        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -c));
+
+        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2));
+        MAIN.scene.camera.setRotationFromQuaternion(quaternion);
     }
 
     get cuePower() {
@@ -101,7 +152,6 @@ class Game {
         MAIN.style = `progress[value]::-webkit-progress-value{
             background-size: 35px 20px, ${maxPower/this._cuePower*100}% 100%, 100% 100% !important;
         }`;
-        console.log(p / maxPower * 1000);
         document.getElementsByTagName('progress')[0].setAttribute('value', this._cuePower / maxPower * 1000);
     }
 
@@ -169,42 +219,46 @@ class Game {
     }
 
     shoot() {
-        let origPos = new THREE.Vector3(0, 0.9, -8.5),
-            backPos = origPos.clone(),
-            frontPos = origPos.clone(),
-            power = this.cuePower / MAIN.loop.tps;
-        backPos.z -= power * 5;
-        frontPos.z += 1.8;
+        if (this.shootingEnabled) {
+            this.shootingEnabled = false;
+            let origPos = new THREE.Vector3(0, 0.9, -8.5),
+                backPos = origPos.clone(),
+                frontPos = origPos.clone(),
+                power = this.cuePower / MAIN.loop.tps;
+            backPos.z -= power * 5;
+            frontPos.z += 1.8;
 
-        let that = this;
-        MAIN.scene.animateObject(MAIN.scene.cue.children[0], backPos, 500);
-        self.setTimeout(function() {
-            let slowTween = MAIN.scene.animateObject(MAIN.scene.cue.children[0], frontPos, 60 / power);
+            let that = this;
+            MAIN.scene.animateObject(MAIN.scene.cue.children[0], backPos, 500);
             self.setTimeout(function() {
-
-                let rotation = MAIN.scene.cue.rotation.y;
-                if (MAIN.scene.cue.rotation.x === Math.PI)
-                    rotation = Math.PI - rotation;
-                if (MAIN.scene.cue.rotation.x < -1)
-                    rotation = Math.PI - rotation;
-                else if (MAIN.scene.cue.rotation.y < 0)
-                    rotation = 2 * Math.PI + rotation;
-                let x = Math.cos(rotation),
-                    z = Math.sin(rotation),
-                    speed = new THREE.Vector3(z, 0, x).multiplyScalar(power);
-
-                that.selectedBall.setSpeed(speed);
-
+                let slowTween = MAIN.scene.animateObject(MAIN.scene.cue.children[0], frontPos, 60 / power);
                 self.setTimeout(function() {
-                    slowTween.stop();
-                    MAIN.scene.animateObject(MAIN.scene.cue.children[0], origPos, 500);
-                }, 200);
 
-            }, 60 / power / 1.9);
-        }, 500);
+                    let rotation = MAIN.scene.cue.rotation.y;
+                    if (MAIN.scene.cue.rotation.x === Math.PI)
+                        rotation = Math.PI - rotation;
+                    if (MAIN.scene.cue.rotation.x < -1)
+                        rotation = Math.PI - rotation;
+                    else if (MAIN.scene.cue.rotation.y < 0)
+                        rotation = 2 * Math.PI + rotation;
+                    let x = Math.cos(rotation),
+                        z = Math.sin(rotation),
+                        speed = new THREE.Vector3(z, 0, x).multiplyScalar(power);
+
+                    that.selectedBall.setSpeed(speed);
+
+                    self.setTimeout(function() {
+                        slowTween.stop();
+                        MAIN.scene.animateObject(MAIN.scene.cue.children[0], origPos, 500);
+                    }, 200);
+
+                }, 60 / power / 1.9);
+            }, 500);
+        }
     }
 
     whiteStop() {
+        MAIN.game.shootingEnabled = true;
         MAIN.scene.animateObject(MAIN.scene.cue, this.position, 1000);
         //check fouls
         let foul = MAIN.game.players[MAIN.game.currentPlayer].hasFoul;
@@ -223,7 +277,7 @@ class Game {
         MAIN.msg('foul! ' + this.players[this.currentPlayer].name + "'s turn");
     }
 
-    saveImage(url, fileName){
+    saveImage(url, fileName) {
         let a = document.createElement("a");
         a.style = "display: none";
         document.body.appendChild(a);
@@ -263,8 +317,8 @@ class Game {
             let x = winnerImg.width / 2 - textSize / 2;
             context.fillText(text, x, 610);
         }
-        return new Promise(function(resolve){
-            canvasElement.toBlob(function(b){
+        return new Promise(function(resolve) {
+            canvasElement.toBlob(function(b) {
                 resolve(URL.createObjectURL(b));
             });
         });
