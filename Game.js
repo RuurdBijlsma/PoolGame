@@ -145,8 +145,8 @@ class Game {
             quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2));
             MAIN.scene.camera.setRotationFromQuaternion(quaternion);
         } else {
-            let a = THREE.Math.degToRad(-e.alpha);
-            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, a, MAIN.scene.camera.rotation._z)
+            let a = THREE.Math.degToRad(e.alpha);
+            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y,a + Math.PI)
             this.prevAngle = a;
         }
     }
