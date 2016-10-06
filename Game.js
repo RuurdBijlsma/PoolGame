@@ -165,6 +165,10 @@ class Game {
     }
 
     onLoop() {
+        if (!MAIN.game.cameraGyro) {
+            MAIN.scene.camera.position.x = this.balls[0].position.x;
+            MAIN.scene.camera.position.z = this.balls[0].position.z;
+        }
         for (let i = 0; i < this.balls.length; i++)
             for (let j = 0; j < this.balls.length; j++)
                 if (i != j && this.balls[i].colliding(this.balls[j]))
