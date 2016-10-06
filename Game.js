@@ -58,6 +58,7 @@ class Game {
         this.gameLoop = MAIN.loop.add(function() { MAIN.game.onLoop() });
 
         if (MAIN.isMobile) {
+            this.cameraGyro = confirm('Enable gyroscopic camera movement?');
             window.addEventListener("deviceorientation", function(e) {
                 MAIN.game.orientation(e);
             }, false);
@@ -127,23 +128,22 @@ class Game {
         let quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), cueRotation);
         MAIN.scene.cue.setRotationFromQuaternion(quaternion);
 
+        if (MAIN.game.cameraGyro) {
+            let a = THREE.Math.degToRad(e.alpha),
+                b = THREE.Math.degToRad(e.beta),
+                c = THREE.Math.degToRad(e.gamma);
 
-        let a = THREE.Math.degToRad(e.alpha),
-            b = THREE.Math.degToRad(e.beta),
-            c = THREE.Math.degToRad(e.gamma);
+            quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
 
-        console.log(e);
+            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2));
 
-        quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), b));
 
-        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2));
+            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -c));
 
-        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), b));
-
-        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -c));
-
-        quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2));
-        MAIN.scene.camera.setRotationFromQuaternion(quaternion);
+            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2));
+            MAIN.scene.camera.setRotationFromQuaternion(quaternion);
+        }
     }
 
     get cuePower() {
