@@ -10,9 +10,10 @@ class Player {
     addPoint(number, pocket, side) {
         if (number === 8 && (this.remainingBalls.length > 0 || pocket !== this.eightBallPocket)) {
             console.log('1', number, this.remainingBalls, pocket, this.eightBallPocket);
-            this.getOpponent().win();
-        } else if (pocket === this.eightBallPocket && number==8 && this.remainingBalls.length === 0) {
+            this.getOpponent().win('The black ball has been illegally pocketed');
+        } else if (pocket === this.eightBallPocket && number == 8 && this.remainingBalls.length === 0) {
             console.log('2', number, this.remainingBalls, pocket, this.eightBallPocket);
+            this.getOpponent().win('Every ball has been legaly pocketed');
             this.win();
         }
         if (!this.side) {
@@ -43,8 +44,8 @@ class Player {
         this.eightBallPocket = (pocket + 3) % 6;
     }
 
-    win() {
-        MAIN.msg(this.name + ' winner');
+    win(reason = '') {
+        MAIN.msg(this.name + ' has won!' + reason);
 
         let winnerElement = document.getElementById('imwinner');
         winnerElement.style.transform = 'scale(0.8)';
@@ -53,12 +54,11 @@ class Player {
         let player = this;
         MAIN.game.getWinnerImage(this.name).then(function(url) {
             winnerElement.style.backgroundImage = 'url(' + url + ')';
-            setTimeout(function() {
-                if (confirm('Print your achievement?')) {
-                    window.open(url).print();
-                    MAIN.game.saveImage(url, player.name);
-                }
-            }, 300);
+
+            MAIN.keyHandler.setSingleKey('p', function() {
+                window.open(url).print();
+                MAIN.game.saveImage(url, player.name);
+            });
         });
     }
 }
