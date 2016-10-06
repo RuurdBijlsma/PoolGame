@@ -40,9 +40,16 @@ class Scene extends THREE.Scene {
         this.stats.showPanel();
         document.body.appendChild(this.stats.dom);
 
-        this.camera.position.x = 0.001;
-        this.camera.position.y = 50;
-        this.camera.position.z = 0;
+        this.camera.rotateOnAxis(new THREE.Vector3(0,0,1), Math.PI);
+        if(main.isMobile){
+            this.camera.position.x = 0;
+            this.camera.position.y = 50;
+            this.camera.position.z = -0.001;
+        }else{
+            this.camera.position.x = -0.001;
+            this.camera.position.y = 30;
+            this.camera.position.z = 0;
+        }
         this.camera.lookAt(new THREE.Vector3);
 
         this.textureLoader = new THREE.TextureLoader();
