@@ -22,7 +22,7 @@ class Main {
         };
         this.isMobile = isMobile.any();
 
-        this.loop = new GameLoop(120);
+        this.loop = new GameLoop(this.isMobile?60:120);
         this.keyHandler = new KeyHandler(this.loop);
         this.scene = new Scene(renderElement, this);
 
