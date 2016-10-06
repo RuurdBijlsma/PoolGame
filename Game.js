@@ -120,6 +120,7 @@ class Game {
                 console.log('power', powerSpeed, MAIN.game.cuePower);
             });
         }
+        this.prevAngle = 0;
     }
 
     orientation(e) {
@@ -143,6 +144,10 @@ class Game {
 
             quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2));
             MAIN.scene.camera.setRotationFromQuaternion(quaternion);
+        } else {
+            let a = THREE.Math.degToRad(-e.alpha);
+            MAIN.scene.camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), this.prevAngle - a);
+            this.prevAngle = a;
         }
     }
 
