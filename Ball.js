@@ -64,8 +64,8 @@ class Ball extends THREE.Mesh {
             rollDirection.applyAxisAngle(rotateAxis, Math.PI / 2);
 
             this.currentRotation += addedAngle;
-            let quaternion = new THREE.Quaternion().setFromAxisAngle(rollDirection, this.currentRotation);
-            this.setRotationFromQuaternion(quaternion);
+
+            this.quaternion.multiplyQuaternions(this.quaternion, new THREE.Quaternion().setFromAxisAngle(rollDirection, this.currentRotation));
 
 
             this.currentPosition = this.nextPosition.clone();
