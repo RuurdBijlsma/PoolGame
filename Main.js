@@ -22,7 +22,7 @@ class Main {
         };
         this.isMobile = isMobile.any();
 
-        this.loop = new GameLoop(this.isMobile?60:120);
+        this.loop = new GameLoop(this.isMobile ? 60 : 120);
         this.keyHandler = new KeyHandler(this.loop);
         this.scene = new Scene(renderElement, this);
 
@@ -72,6 +72,25 @@ class Main {
         this.keyHandler.setSingleKey('f', function() {
             main.game.freePlace(main.game.balls.filter((ball) => ball.number === 0)[0]);
         });
+
+        document.addEventListener('keydown', function(e) {
+            if (this.katKeys === undefined) {
+                this.katKeys = '';
+                this.katMaterial = new MeshAnimationMaterial({
+                    directory: 'img/textures/kat',
+                    side: THREE.FrontSide
+                });
+            }
+            this.katKeys += e.key;
+            if (this.katKeys === 'kat.gif') {
+                this.katKeys = '';
+                for (let ball of MAIN.game.balls) {
+                    ball.material = this.katMaterial;
+                }
+                MAIN.scene.tableFloor.mesh.material = this.katMaterial;
+                this.katMaterial.play();
+            }
+        }, false);
     }
 
 

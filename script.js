@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', init, false);
 
 function init() {
     MAIN = new Main(document.getElementById('renderView'));
-    //newGame('Rurd','Bijlsma');
+    newGame('Rurd','Bijlsma');
 }
 
 function newGame(n1, n2) {
