@@ -7,6 +7,7 @@ class Game {
         this.shootingEnabled = true;
 
         this.hitSound = new FrequencySound('sound/hit.mp3');
+        this.pocketSound = new VolumeSound('sound/pocket.mp3');
 
         this.balls = [
             new Ball(0, -13.5 / 2),

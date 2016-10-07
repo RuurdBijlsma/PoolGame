@@ -112,6 +112,11 @@ class Ball extends THREE.Mesh {
                 scorePocket = 6;
 
             if (scorePocket) {
+                MAIN.game.hitSound.play(0.2);
+                setTimeout(() => MAIN.game.hitSound.play(0.4), 300);
+                setTimeout(() => MAIN.game.hitSound.play(0.3), 500);
+                setTimeout(() => MAIN.game.pocketSound.play(0.05 * (0.5 + Math.random())), 250);
+
                 this.speed.set(0, 0, 0);
                 this.ballLoop = MAIN.loop.remove(this.ballLoop);
                 MAIN.game.score(this.number, scorePocket, this.stripe);
