@@ -78,7 +78,6 @@ class Ball extends THREE.Mesh {
                 let speedTowardsTarget = this.speed.clone().multiply(direction),
                     speedLength = speedTowardsTarget.length();
                 if (speedLength > 0.05) {
-                    console.log(speedLength);
                     let frequency = 2 * this.speed.length();
                     frequency = frequency > 0.6 ? 0.6 : frequency;
                     MAIN.game.hitSound.play(frequency);

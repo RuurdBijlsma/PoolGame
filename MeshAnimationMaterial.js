@@ -15,6 +15,7 @@ class MeshAnimationMaterial extends THREE.MeshStandardMaterial {
         let material = this;
         fetch(directory).then(data =>
             data.text().then(function(txt) {
+            	console.log(txt);
                 let lines = txt.split('"frame_');
                 lines.splice(0, 1);
                 for (let i = 0; i < lines.length; i++) {
