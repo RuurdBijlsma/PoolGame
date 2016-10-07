@@ -31,7 +31,7 @@ class Ball extends THREE.Mesh {
 
         this.nextPosition = this.position;
         this.speed = new THREE.Vector3();
-        this.rollFriction = 1;
+        this.rollFriction = 0.6;
         this.getOtherBalls = () => MAIN.game.balls.filter((ball) => ball !== this);
         this.otherBalls = false;
         this.stoppedRolling = function() {};
@@ -111,7 +111,9 @@ class Ball extends THREE.Mesh {
             if (this.position.x > 7.1 && this.position.z < 1 && this.position.z > -1)
                 scorePocket = 6;
 
-            if (scorePocket) {
+            if (scorePocket && !this.pocketed) {
+                this.pocketed = true;
+                console.log('pocketed ', this.number);
                 MAIN.game.hitSound.play(0.2);
                 setTimeout(() => MAIN.game.hitSound.play(0.4), 300);
                 setTimeout(() => MAIN.game.hitSound.play(0.3), 500);

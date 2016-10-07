@@ -39,13 +39,13 @@ class Player {
         }
         document.getElementsByClassName('b' + number)[0].style.display = 'none';
         this.remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
-
         this.getOpponent().remainingBalls = this.getOpponent().remainingBalls.filter((ballNumber) => ballNumber !== number);
+
         this.eightBallPocket = (pocket + 3) % 6;
     }
 
     win(reason = '') {
-        MAIN.msg(this.name + ' has won!' + reason);
+        MAIN.msg(this.name + ' has won! ' + reason);
 
         let winnerElement = document.getElementById('imwinner');
         winnerElement.style.transform = 'scale(0.8)';

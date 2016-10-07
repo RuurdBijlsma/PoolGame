@@ -46,8 +46,8 @@ class Scene extends THREE.Scene {
             this.camera.position.y = 50;
             this.camera.position.z = -0.001;
         } else {
-            this.camera.position.x = -0.001;
-            this.camera.position.y = 30;
+            this.camera.position.x = -0.1;
+            this.camera.position.y = 25;
             this.camera.position.z = 0;
         }
         this.camera.lookAt(new THREE.Vector3);
