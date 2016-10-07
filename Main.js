@@ -28,6 +28,10 @@ class Main {
 
         this.styleElement = document.body.appendChild(document.createElement('style'));
 
+        this.katMaterial = new MeshAnimationMaterial({
+            directory: 'img/textures/kat',
+            side: THREE.FrontSide
+        });
         this.setKeymap();
     }
 
@@ -76,19 +80,15 @@ class Main {
         document.addEventListener('keydown', function(e) {
             if (this.katKeys === undefined) {
                 this.katKeys = '';
-                this.katMaterial = new MeshAnimationMaterial({
-                    directory: 'img/textures/kat',
-                    side: THREE.FrontSide
-                });
             }
             this.katKeys += e.key;
             if (this.katKeys === 'kat.gif') {
                 this.katKeys = '';
                 for (let ball of MAIN.game.balls) {
-                    ball.material = this.katMaterial;
+                    ball.material = MAIN.katMaterial;
                 }
-                MAIN.scene.tableFloor.mesh.material = this.katMaterial;
-                this.katMaterial.play();
+                MAIN.scene.tableFloor.mesh.material = MAIN.katMaterial;
+                MAIN.katMaterial.play();
             }
         }, false);
     }
