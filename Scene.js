@@ -29,7 +29,7 @@ class Scene extends THREE.Scene {
             scene.onWindowResize();
         }, false);
 
-        if(!main.isMobile){
+        if (!main.isMobile) {
             this.controls = new THREE.OrbitControls(this.camera, renderElement);
             this.controls.maxPolarAngle = Math.PI / 2 - 0.01;
             this.controls.maxDistance = 100;
@@ -40,12 +40,12 @@ class Scene extends THREE.Scene {
         this.stats.showPanel();
         document.body.appendChild(this.stats.dom);
 
-        this.camera.rotateOnAxis(new THREE.Vector3(0,0,1), Math.PI);
-        if(main.isMobile){
+        this.camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI);
+        if (main.isMobile) {
             this.camera.position.x = 0;
             this.camera.position.y = 50;
             this.camera.position.z = -0.001;
-        }else{
+        } else {
             this.camera.position.x = -0.001;
             this.camera.position.y = 30;
             this.camera.position.z = 0;
@@ -62,7 +62,7 @@ class Scene extends THREE.Scene {
 
         this.skyBox = new SkyBox(this, 'img/skybox/space/');
 
-        let clothMap = this.textureLoader.load('img/textures/cloth.jpg'),
+        let clothMap = this.textureLoader.load('img/textures/cloth©.jpg'),
             clothMaterial = new THREE.MeshStandardMaterial(
                 this.laptopGraphics ? {
                     map: clothMap
@@ -120,9 +120,9 @@ class Scene extends THREE.Scene {
         this.tableWallMesh.position.y = .5;
         this.add(this.tableWallMesh);
 
-        this.tableFloor = new ObjMesh(this, 'obj/table/floor.obj', 'img/textures/cloth.jpg', 2, false, true, !this.laptopGraphics);
-        this.tableBase = new ObjMesh(this, 'obj/table/woodwalls.obj', 'img/textures/wood.jpg', 30, true, this.laptopGraphics, !this.laptopGraphics);
-        this.tableLegs = new ObjMesh(this, 'obj/table/legs.obj', 'img/textures/wood.jpg', 10, !this.laptopGraphics, true, !this.laptopGraphics);
+        this.tableFloor = new ObjMesh(this, 'obj/table/floor.obj', 'img/textures/cloth©.jpg', 2, false, true, !this.laptopGraphics);
+        this.tableBase = new ObjMesh(this, 'obj/table/woodwalls.obj', 'img/textures/wood©.jpg', 30, true, this.laptopGraphics, !this.laptopGraphics);
+        this.tableLegs = new ObjMesh(this, 'obj/table/legs.obj', 'img/textures/wood©.jpg', 10, !this.laptopGraphics, true, !this.laptopGraphics);
 
         let keuGeometry = new THREE.CylinderGeometry(0.06, 0.1, 15, 32, 32),
             keuMaterial = new THREE.MeshStandardMaterial({ color: 0xfda43a }),
@@ -143,7 +143,7 @@ class Scene extends THREE.Scene {
         this.add(this.cue);
 
         let floorGeometry = new THREE.BoxGeometry(90, 150, 100, 0),
-            floorMap = new THREE.TextureLoader().load('img/textures/floorwood.jpg'),
+            floorMap = new THREE.TextureLoader().load('img/textures/floorwood©.jpg'),
             floorMaterial = new THREE.MeshPhongMaterial(this.laptopGraphics ? {
                 map: floorMap
             } : {

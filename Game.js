@@ -1,7 +1,6 @@
 class Game {
     //TODO:
-    //Power meter laten zien
-    //Ballen goed laten vallen
+    //Wall bug fixen dat hij daar even vast zit, hij is dan voorbij de plane van de muur denk ik
     constructor(player1, player2) {
         this.players = [player1, player2];
         this.cheatLine = false;
