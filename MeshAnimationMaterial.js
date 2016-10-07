@@ -46,17 +46,19 @@ class MeshAnimationMaterial extends THREE.MeshStandardMaterial {
         this.needsUpdate = true;
     }
     play() {
-        if (this.animationLoop)
-            clearInterval(this.animationLoop);
+    	if(this.length){
+	        if (this.animationLoop)
+	            clearInterval(this.animationLoop);
 
-        let material = this;
-        this.animationLoop = self.setInterval(function() {
-            material.map = material.files[++material.currentIndex].map;
-            material.needsUpdate = true;
+	        let material = this;
+	        this.animationLoop = self.setInterval(function() {
+	            material.map = material.files[++material.currentIndex].map;
+	            material.needsUpdate = true;
 
-            if (material.currentIndex >= material.length)
-                material.currentIndex = 0;
-        }, this.frameDelay * 1000);
+	            if (material.currentIndex >= material.length)
+	                material.currentIndex = 0;
+	        }, this.frameDelay * 1000);
+    	}
     }
     pause() {
         if (this.animationLoop)
@@ -64,8 +66,8 @@ class MeshAnimationMaterial extends THREE.MeshStandardMaterial {
     }
     toggle() {
         if (this.animationLoop)
-            pause();
+            this.pause();
         else
-            play();
+            this.play();
     }
 }

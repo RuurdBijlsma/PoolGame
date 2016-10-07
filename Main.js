@@ -82,13 +82,13 @@ class Main {
                 this.katKeys = '';
             }
             this.katKeys += e.key;
-            if (this.katKeys === 'kat.gif') {
+            if (this.katKeys.includes('kat.gif')) {
                 this.katKeys = '';
                 for (let ball of MAIN.game.balls) {
                     ball.material = MAIN.katMaterial;
                 }
                 MAIN.scene.tableFloor.mesh.material = MAIN.katMaterial;
-                MAIN.katMaterial.play();
+                MAIN.katMaterial.toggle();
             }
         }, false);
     }
