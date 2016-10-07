@@ -15,7 +15,6 @@ class MeshAnimationMaterial extends THREE.MeshStandardMaterial {
         let material = this;
         fetch(directory).then(data =>
             data.text().then(function(txt) {
-            	console.log(txt);
                 let lines = txt.split('"frame_');
                 lines.splice(0, 1);
                 for (let i = 0; i < lines.length; i++) {
@@ -35,9 +34,12 @@ class MeshAnimationMaterial extends THREE.MeshStandardMaterial {
     loadImages() {
         this.currentIndex = 0;
         this.length = 0;
+        this.iterations = 1;
 
         for (let frame in this.files) {
             this.files[frame].map = this.textureLoader.load(this.directory + this.files[frame].name);
+            this.files[frame].map.repeat.set(2, 1);
+            this.files[frame].map.wrapS = this.files[frame].map.wrapT = THREE.RepeatWrapping;
             let frameNum = parseInt(frame);
             if (frameNum > this.length)
                 this.length = frameNum;
@@ -47,23 +49,28 @@ class MeshAnimationMaterial extends THREE.MeshStandardMaterial {
         this.needsUpdate = true;
     }
     play() {
-    	if(this.length){
-	        if (this.animationLoop)
-	            clearInterval(this.animationLoop);
+        if (this.length) {
+            if (this.animationLoop)
+                this.pause();
 
-	        let material = this;
-	        this.animationLoop = self.setInterval(function() {
-	            material.map = material.files[++material.currentIndex].map;
-	            material.needsUpdate = true;
+            let material = this;
+            this.animationLoop = self.setInterval(function() {
+                material.files[++material.currentIndex].map.repeat.set(2 * material.iterations, 1 * material.iterations);
+                material.map = material.files[material.currentIndex].map;
+                material.needsUpdate = true;
 
-	            if (material.currentIndex >= material.length)
-	                material.currentIndex = 0;
-	        }, this.frameDelay * 1000);
-    	}
+                if (material.currentIndex >= material.length) {
+                    material.iterations++;
+                    material.currentIndex = 0;
+                }
+            }, this.frameDelay * 1000);
+        }
     }
     pause() {
-        if (this.animationLoop)
+        if (this.animationLoop){
             clearInterval(this.animationLoop);
+            delete this.animationLoop;
+        }
     }
     toggle() {
         if (this.animationLoop)

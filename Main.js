@@ -73,7 +73,7 @@ class Main {
             main.scene.children = main.scene.children.filter((child) => child.type !== 'Line');
             main.game.cheatLine = !main.game.cheatLine;
         });
-        this.keyHandler.setSingleKey('f', function() {
+        this.keyHandler.setSingleKey('w', function() {
             main.game.freePlace(main.game.balls.filter((ball) => ball.number === 0)[0]);
         });
 

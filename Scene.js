@@ -60,7 +60,7 @@ class Scene extends THREE.Scene {
             ambient: new AmbientLight(this, 0xffffdd, 0.1)
         };
 
-        this.skyBox = new SkyBox(this, 'img/skybox/space/');
+        this.skyBox = new SkyBox(this, 'img/skybox/clouds/');
 
         let clothMap = this.textureLoader.load('img/textures/cloth©.jpg'),
             clothMaterial = new THREE.MeshStandardMaterial(
