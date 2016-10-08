@@ -32,6 +32,8 @@ class Game {
             new Ball(1.28, 6.4 + 2.75, 0.3075, true, 7, false),
             new Ball(-1.28, 6.4 + 2.75, 0.3075, true, 12, true)
         ];
+        this.maxPower = this.balls[0].radius * MAIN.loop.tps * 1.5;
+
         this.balls[0].stoppedRolling = this.whiteStop;
         MAIN.scene.lights.spot.target = this.balls[0];
         let ballPos = this.balls[0].position;
@@ -44,7 +46,7 @@ class Game {
         this.highlightedBall = null;
         this.selectedBall = this.balls[0];
 
-        this.cuePower = 30;
+        this.cuePower = this.maxPower / 1.5;
 
         this.beurtElement = document.getElementById("beurt");
         this.players = [new Player(player1, 1), new Player(player2, 0)];
@@ -60,7 +62,6 @@ class Game {
         this.gameLoop = MAIN.loop.add(function() { MAIN.game.onLoop() });
 
         if (MAIN.isMobile) {
-            this.cameraGyro = confirm('Enable gyroscopic camera movement?');
             window.addEventListener("deviceorientation", function(e) {
                 MAIN.game.orientation(e);
             }, false);
@@ -71,10 +72,12 @@ class Game {
             document.addEventListener('touchmove', function(e) {
                 let tap = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
 
-                if (MAIN.game.tapLength > 10) {
-                    let horizontalLength = tap.x / window.innerWidth,
-                        maxPower = 0.3075 * MAIN.loop.tps;
-                    MAIN.game.cuePower = horizontalLength * maxPower;
+                MAIN.game.mousePos.x = (tap.x / window.innerWidth) * 2 - 1;
+                MAIN.game.mousePos.y = -(tap.y / window.innerHeight) * 2 + 1;
+
+                if (MAIN.game.tapLength > 10 && !MAIN.game.placeLoop) {
+                    let horizontalLength = tap.x / window.innerWidth;
+                    MAIN.game.cuePower = horizontalLength * MAIN.game.maxPower;
                 } else {
                     MAIN.game.tapLength = tap.distanceTo(MAIN.game.tapStart);
                 }
@@ -84,12 +87,13 @@ class Game {
                     if (this.placeLoop) {
                         this.shootingEnabled = true;
                         this.placeLoop = MAIN.loop.remove(this.placeLoop);
+                    }else{
+                        MAIN.game.shoot();
                     }
-
-                    MAIN.game.shoot();
                 }
             }, false);
         } else {
+            MAIN.scene.topView();
             document.addEventListener('mousemove', function(e) {
                 MAIN.game.mousemove(e);
             }, false);
@@ -121,58 +125,32 @@ class Game {
                 MAIN.game.cuePower -= powerSpeed;
             });
         }
-        this.prevAngle = 0;
     }
 
     orientation(e) {
-        let cueRotation = THREE.Math.degToRad(e.alpha);
+        let rotation = THREE.Math.degToRad(e.alpha + 90);
 
-        let quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), cueRotation);
+        let quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotation + Math.PI);
         MAIN.scene.cue.setRotationFromQuaternion(quaternion);
-
-        if (MAIN.game.cameraGyro) {
-            let a = THREE.Math.degToRad(e.alpha),
-                b = THREE.Math.degToRad(e.beta),
-                c = THREE.Math.degToRad(e.gamma);
-
-            quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
-
-            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2));
-
-            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), b));
-
-            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -c));
-
-            quaternion.multiplyQuaternions(quaternion, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2));
-            MAIN.scene.camera.setRotationFromQuaternion(quaternion);
-        } else {
-            let a = THREE.Math.degToRad(e.alpha);
-            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, a + Math.PI)
-            this.prevAngle = a;
-        }
+        MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, rotation);
     }
 
     get cuePower() {
         return this._cuePower;
     }
     set cuePower(p) {
-        let maxPower = 0.3075 * MAIN.loop.tps;
-        this._cuePower = p > maxPower ? maxPower : p;
+        this._cuePower = p > this.maxPower ? this.maxPower : p;
         this._cuePower = this._cuePower < 0 ? 0 : this._cuePower;
         MAIN.style = `progress[value]::-webkit-progress-value{
-            background-size: 35px 20px, ${maxPower/this._cuePower*100}% 100%, 100% 100% !important;
+            background-size: 35px 20px, ${this.maxPower/this._cuePower*100}% 100%, 100% 100% !important;
         }`;
-        document.getElementsByTagName('progress')[0].setAttribute('value', this._cuePower / maxPower * 1000);
+        document.getElementsByTagName('progress')[0].setAttribute('value', this._cuePower / this.maxPower * 1000);
     }
 
     onLoop() {
-        if (!MAIN.game.cameraGyro && MAIN.isMobile) {
-            MAIN.scene.camera.position.x = this.balls[0].position.x;
-            MAIN.scene.camera.position.z = this.balls[0].position.z;
-        }
         for (let i = 0; i < this.balls.length; i++)
-            for (let j = 0; j < this.balls.length; j++)
-                if (i != j && this.balls[i].colliding(this.balls[j]))
+            for (let j = i + 1; j < this.balls.length; j++)
+                if (this.balls[i].colliding(this.balls[j]))
                     this.balls[i].resolveCollision(this.balls[j]);
 
         if (this.cheatLine) {
@@ -368,6 +346,8 @@ class Game {
         ball.speed.set(0, 0, 0);
         ball.ballLoop = MAIN.loop.remove(ball.ballLoop);
         let that = this;
+        if (this.placeLoop)
+            MAIN.loop.remove(this.placeLoop);
         this.placeLoop = MAIN.loop.add(function() {
             that.raycaster.setFromCamera(that.mousePos, MAIN.scene.camera);
             let intersects = that.raycaster.intersectObjects([MAIN.scene.tableFloor.mesh]);

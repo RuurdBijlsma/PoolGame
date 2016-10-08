@@ -18,7 +18,10 @@ class Ball extends THREE.Mesh {
         this.position.set(x, radius, z);
         this.castShadow = shadow;
         this.mass = 1;
-        this.restitution = 1;
+        this.restitution = {
+            ball: 0.95,
+            wall: 0.8
+        };
         this.number = number;
         this.currentRotation = 0;
         MAIN.scene.add(this);
@@ -64,8 +67,8 @@ class Ball extends THREE.Mesh {
             rollDirection.applyAxisAngle(rotateAxis, Math.PI / 2);
 
             this.currentRotation += addedAngle;
-
-            this.quaternion.multiplyQuaternions(this.quaternion, new THREE.Quaternion().setFromAxisAngle(rollDirection, this.currentRotation));
+            let quaternion = new THREE.Quaternion().setFromAxisAngle(rollDirection, this.currentRotation);
+            this.setRotationFromQuaternion(quaternion);
 
 
             this.currentPosition = this.nextPosition.clone();
@@ -81,17 +84,18 @@ class Ball extends THREE.Mesh {
                     let frequency = 2 * this.speed.length();
                     frequency = frequency > 0.6 ? 0.6 : frequency;
                     MAIN.game.hitSound.play(frequency);
+                    this.speed.multiplyScalar(this.restitution.wall);
                 }
-                direction.reflect(direction).normalize();
-                if (distance - this.radius < 0) {
-                    this.position.add(direction.clone().multiplyScalar(distance - this.radius));
-                }
+                if (distance - this.radius < 0)
+                    this.currentPosition.add(direction.clone().multiplyScalar(distance - this.radius));
+                
+                direction.reflect(direction).normalize(); //normaal
                 let speed = this.speed;
 
                 let outgoingVector = ((d, n) => d.sub(n.multiplyScalar(d.dot(n) * 2))),
                     outgoing = outgoingVector(speed.clone(), direction);
 
-                this.speed = outgoing.clone().multiplyScalar(this.restitution);
+                this.speed = outgoing.clone();
             }
 
             let scorePocket = false;
@@ -128,6 +132,7 @@ class Ball extends THREE.Mesh {
                 MAIN.scene.animateScale(this, { x: 0.1, y: 0.1, z: 0.1 }, 500);
             }
 
+            this.prevPosition = this.position.clone();
             this.position.set(this.currentPosition.x, this.currentPosition.y, this.currentPosition.z);
             this.nextPosition = this.currentPosition.addVectors(this.speed, this.position);
         }
@@ -221,19 +226,36 @@ class Ball extends THREE.Mesh {
     }
     resolveCollision(ball) {
         this.playSound(ball);
+        let dx = this.nextPosition.x - ball.nextPosition.x,
+            dy = this.nextPosition.z - ball.nextPosition.z,
+            collisionAngle = Math.atan2(dy, dx),
+            speed1 = this.speed.length(),
+            speed2 = ball.speed.length(),
+            direction1 = Math.atan2(this.speed.z, this.speed.x),
+            direction2 = Math.atan2(ball.speed.z, ball.speed.x),
 
-        let direction = this.directionTo(ball);
-        direction.normalize();
-        let outgoingVector = ((d, n) => d.sub(n.multiplyScalar(d.dot(n) * 2))),
-            outgoing = outgoingVector(this.speed.clone(), direction);
+            velocityx_1 = speed1 * Math.cos(direction1 - collisionAngle),
+            velocityy_1 = speed1 * Math.sin(direction1 - collisionAngle),
+            velocityx_2 = speed2 * Math.cos(direction2 - collisionAngle),
+            velocityy_2 = speed2 * Math.sin(direction2 - collisionAngle),
 
-        if (this.speed.length() < 0.001) {
-            let moveOut = direction.clone();
-            moveOut.normalize();
-            this.position.add(moveOut.multiplyScalar(ball.position.distanceTo(this.position) - ball.radius - this.radius))
-        } else {
-            this.setSpeed(outgoing.clone());
-            ball.setSpeed(direction.normalize().multiplyScalar(this.speed.length() * this.restitution));
-        }
+            // velocity1 = ((this.mass - ball.mass) * velocity1 + 2 * ball.mass * velocity2) / this.mass + ball.mass,
+            // velocity2 = ((ball.mass - this.mass) * velocity2 + 2 * this.mass * velocity1) / this.mass + ball.mass,
+
+            final_velocityx_1 = ((this.mass - ball.mass) * velocityx_1 + (ball.mass + ball.mass) * velocityx_2) / (this.mass + ball.mass),
+            final_velocityx_2 = ((this.mass + this.mass) * velocityx_1 + (ball.mass - this.mass) * velocityx_2) / (this.mass + ball.mass),
+            final_velocityy_1 = velocityy_1,
+            final_velocityy_2 = velocityy_2;
+
+        this.speed.x = Math.cos(collisionAngle) * final_velocityx_1 + Math.cos(collisionAngle + Math.PI / 2) * final_velocityy_1;
+        this.speed.z = Math.sin(collisionAngle) * final_velocityx_1 + Math.sin(collisionAngle + Math.PI / 2) * final_velocityy_1;
+        ball.speed.x = Math.cos(collisionAngle) * final_velocityx_2 + Math.cos(collisionAngle + Math.PI / 2) * final_velocityy_2;
+        ball.speed.z = Math.sin(collisionAngle) * final_velocityx_2 + Math.sin(collisionAngle + Math.PI / 2) * final_velocityy_2;
+
+        this.speed.multiplyScalar(this.restitution.ball);
+        ball.speed.multiplyScalar(ball.restitution.ball);
+
+        this.setSpeed(this.speed);
+        ball.setSpeed(ball.speed);
     }
 }

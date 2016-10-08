@@ -69,6 +69,13 @@ class Main {
         this.keyHandler.setSingleKey('s', function() {
             main.scene.toggleStats();
         });
+        this.keyHandler.setSingleKey('o', function() {
+            clearInterval(MAIN.loop.gameloop);
+            MAIN.loop.loop();
+        });
+        this.keyHandler.setSingleKey('p', function() {
+            MAIN.loop.start();
+        });
         this.keyHandler.setSingleKey('c', function() {
             main.scene.children = main.scene.children.filter((child) => child.type !== 'Line');
             main.game.cheatLine = !main.game.cheatLine;

@@ -40,17 +40,23 @@ class Scene extends THREE.Scene {
         this.stats.showPanel();
         document.body.appendChild(this.stats.dom);
 
-        this.camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI);
         if (main.isMobile) {
+            this.camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI);
             this.camera.position.x = 0;
             this.camera.position.y = 50;
-            this.camera.position.z = -0.001;
+            this.camera.position.z = -0.01;
+            this.camera.lookAt(new THREE.Vector3);
         } else {
-            this.camera.position.x = -0.1;
-            this.camera.position.y = 25;
-            this.camera.position.z = 0;
+            this.camera.rotation._x = -0.3739616455348653;
+            this.camera.rotation._y = 0.6795008955699466;
+            this.camera.rotation._z = 0.20803619565163492;
+            this.camera.rotateY(0.7);
+            this.camera.rotateX(-0.3);
+
+            this.camera.position.x = 12.962642602541662;
+            this.camera.position.y = 4.14642045750715;
+            this.camera.position.z = 21.23235543313809;
         }
-        this.camera.lookAt(new THREE.Vector3);
 
         this.textureLoader = new THREE.TextureLoader();
 

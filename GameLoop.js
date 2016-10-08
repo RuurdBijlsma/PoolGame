@@ -5,10 +5,7 @@ class GameLoop {
             0: function() {}
         };
         this.amount = 1;
-        let gameLoop = this;
-        this.gameloop = self.setInterval(function() {
-            gameLoop.loop(gameLoop);
-        }, 1000 / tps);
+        this.start();
     }
     add(fun) {
         this.functions[this.amount] = fun;
@@ -18,8 +15,14 @@ class GameLoop {
         delete this.functions[funIndex];
         return false;
     }
-    loop(gameLoop) {
-        for (let funKey in gameLoop.functions)
-            gameLoop.functions[funKey]();
+    start(){
+        let gameLoop = this;
+        this.gameloop = self.setInterval(function() {
+            gameLoop.loop();
+        }, 1000 / this.tps);
+    }
+    loop() {
+        for (let funKey in this.functions)
+            this.functions[funKey]();
     }
 }
