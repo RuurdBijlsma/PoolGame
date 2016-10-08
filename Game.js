@@ -70,6 +70,7 @@ class Game {
                 MAIN.game.tapStart = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
             }, false);
             document.addEventListener('touchmove', function(e) {
+                e.preventDefault();
                 let tap = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
 
                 MAIN.game.mousePos.x = (tap.x / window.innerWidth) * 2 - 1;
