@@ -103,16 +103,19 @@ class Main {
 
     msg(string) {
         let msgBox = document.getElementById('messageBox'),
-            progressBar = document.getElementsByTagName('progress')[0];
+            progressBar = document.getElementsByTagName('progress')[0],
+            cameraButton = document.getElementById('cameraButton');
         msgBox.innerHTML = string;
         msgBox.style.transform = 'translateY(0px)';
         progressBar.style.transform = 'translateY(-60px)';
+        cameraButton.style.transform = 'translateY(-60px)';
 
         if (this.msgTimeout)
             clearTimeout(this.msgTimeout);
         this.msgTimeout = self.setTimeout(function() {
             msgBox.style.transform = 'translateY(60px)';
             progressBar.style.transform = 'translateY(0px)';
+            cameraButton.style.transform = 'translateY(0px)';
         }, 3000 + string.length * 100);
     }
 }

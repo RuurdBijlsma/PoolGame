@@ -61,7 +61,9 @@ class Game {
 
         this.gameLoop = MAIN.loop.add(function() { MAIN.game.onLoop() });
 
+        document.getElementsByTagName('progress')[0].style.display = 'block';
         if (MAIN.isMobile) {
+            document.getElementById('cameraButton').style.display = 'block';
             window.addEventListener("deviceorientation", function(e) {
                 MAIN.game.orientation(e);
             }, false);
@@ -77,8 +79,8 @@ class Game {
 
                 MAIN.game.tapPos = tap;
 
-                if (MAIN.game.tapLength > 50 && !MAIN.game.placeLoop) {
-                    if (Math.abs(tap.x - MAIN.game.tapStart.x) > 50) {
+                if (MAIN.game.tapLength > 30 && !MAIN.game.placeLoop) {
+                    if (Math.abs(tap.x - MAIN.game.tapStart.x) > 30) {
                         MAIN.game.tapStart.x = -200;
                         let horizontalLength = tap.x / window.innerWidth;
                         MAIN.game.cuePower = horizontalLength * MAIN.game.maxPower;
@@ -88,16 +90,13 @@ class Game {
                 }
             }, true);
             document.addEventListener('touchend', function(e) {
-                if (MAIN.game.placeLoop) {
-                    MAIN.game.shootingEnabled = true;
-                    MAIN.game.placeLoop = MAIN.loop.remove(MAIN.game.placeLoop);
-                    MAIN.game.selectedBall.stoppedRolling();
-                } else {
-                    if (e.touches[3]) {
-                        MAIN.game.fixedRotation = !MAIN.game.fixedRotation;
-                        MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, Math.PI);
+                if (window.innerWidth - MAIN.game.tapStart.x >= 60 & window.innerHeight - MAIN.game.tapStart.y >= 80) {
+                    if (MAIN.game.placeLoop) {
+                        MAIN.game.shootingEnabled = true;
+                        MAIN.game.placeLoop = MAIN.loop.remove(MAIN.game.placeLoop);
+                        MAIN.game.selectedBall.stoppedRolling();
                     } else {
-                        if (MAIN.game.tapLength < 10) {
+                        if (MAIN.game.tapLength < 30) {
                             if (this.placeLoop) {
                                 this.shootingEnabled = true;
                                 this.placeLoop = MAIN.loop.remove(this.placeLoop);
@@ -156,6 +155,12 @@ class Game {
         MAIN.scene.cue.setRotationFromQuaternion(quaternion);
 
         MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, MAIN.game.fixedRotation ? Math.PI : rotation);
+    }
+
+    toggleCamera(e) {
+        e.stopPropagation();
+        this.fixedRotation = !this.fixedRotation;
+        MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, Math.PI);
     }
 
     get cuePower() {
