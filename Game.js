@@ -75,8 +75,10 @@ class Game {
                 MAIN.game.mousePos.x = (tap.x / window.innerWidth) * 2 - 1;
                 MAIN.game.mousePos.y = -(tap.y / window.innerHeight) * 2 + 1;
 
+                MAIN.game.tapPos = tap;
+
                 if (MAIN.game.tapLength > 50 && !MAIN.game.placeLoop) {
-                    if (tap.x - MAIN.game.tapStart.x > 50) {
+                    if (Math.abs(tap.x - MAIN.game.tapStart.x) > 50) {
                         MAIN.game.tapStart.x = -200;
                         let horizontalLength = tap.x / window.innerWidth;
                         MAIN.game.cuePower = horizontalLength * MAIN.game.maxPower;
@@ -86,18 +88,27 @@ class Game {
                 }
             }, true);
             document.addEventListener('touchend', function(e) {
-                if (MAIN.game.tapLength < 10) {
-                    if (this.placeLoop) {
-                        this.shootingEnabled = true;
-                        this.placeLoop = MAIN.loop.remove(this.placeLoop);
-                    } else {
-                        MAIN.game.shoot();
-                    }
+                if (MAIN.game.placeLoop) {
+                    MAIN.game.shootingEnabled = true;
+                    MAIN.game.placeLoop = MAIN.loop.remove(MAIN.game.placeLoop);
+                    MAIN.game.selectedBall.stoppedRolling();
                 } else {
-                    let verticalLength = (MAIN.game.mousePos.y - MAIN.game.tapStart.y) / window.innerHeight;
-                    if (verticalLength < -0.5) {
-                        MAIN.scene.children = MAIN.scene.children.filter((child) => child.type !== 'Line');
-                        MAIN.game.cheatLine = !MAIN.game.cheatLine;
+                    if (MAIN.game.tapLength < 10) {
+                        if (this.placeLoop) {
+                            this.shootingEnabled = true;
+                            this.placeLoop = MAIN.loop.remove(this.placeLoop);
+                        } else {
+                            MAIN.game.shoot();
+                        }
+                    } else {
+                        let verticalLength = (MAIN.game.tapPos.y - MAIN.game.tapStart.y) / window.innerHeight;
+                        if (verticalLength < -0.5) {
+                            MAIN.scene.children = MAIN.scene.children.filter((child) => child.type !== 'Line');
+                            MAIN.game.cheatLine = !MAIN.game.cheatLine;
+                        } else if (verticalLength > 0.5) {
+                            MAIN.game.fixedRotation = !MAIN.game.fixedRotation;
+                            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, Math.PI);
+                        }
                     }
                 }
             }, false);
@@ -139,9 +150,10 @@ class Game {
     orientation(e) {
         let rotation = THREE.Math.degToRad(e.alpha - 180);
 
-        let quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotation + Math.PI);
+        let quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotation * (MAIN.game.fixedRotation ? -1 : 1) + Math.PI);
         MAIN.scene.cue.setRotationFromQuaternion(quaternion);
-        MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, rotation);
+
+        MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, MAIN.game.fixedRotation ? Math.PI : rotation);
     }
 
     get cuePower() {
