@@ -12,22 +12,38 @@ class KeyHandler {
 
         this.checkLoop = gameLoop.add(function() {
             for (let checkKey in handler.continuousKeyFunctions)
-                if (handler.isPressed(checkKey))
-                    handler.continuousKeyFunctions[checkKey](handler.keyPressed[handler.keyPressed.map(k=>k.key).indexOf(checkKey)].event);
+                handler.isPressed(checkKey) && handler.continuousKeyFunctions[checkKey].action(handler.keyPressed[handler.keyPressed.map(k => k.key).indexOf(checkKey)].event);
         });
 
         this.singleKeyFunctions = {};
         this.continuousKeyFunctions = {};
     }
 
-    setSingleKey(key, fun) {
-        this.singleKeyFunctions[key] = fun;
+    get keyMap(){
+        let map = {};
+        map.continuous = {};
+        for(let key in this.continuousKeyFunctions)
+            map.continuous[key] = this.continuousKeyFunctions[key];
+        map.single = {};
+        for(let key in this.singleKeyFunctions)
+            map.single[key] = this.singleKeyFunctions[key];
+        return map;
+    }
+
+    setSingleKey(key, name, fun) {
+        this.singleKeyFunctions[key] = {
+            action: fun,
+            name: name
+        };
     }
     deleteSingleKey(key) {
         delete this.singleKeyFunctions[key];
     }
-    setContinuousKey(key, fun) {
-        this.continuousKeyFunctions[key] = fun;
+    setContinuousKey(key, name, fun) {
+        this.continuousKeyFunctions[key] = {
+            action: fun,
+            name: name
+        };
     }
     deleteContinuousKey(key) {
         delete this.continuousKeyFunctions[key];
@@ -43,15 +59,15 @@ class KeyHandler {
         }
         for (let checkKey in handler.singleKeyFunctions)
             if (key === checkKey)
-                handler.singleKeyFunctions[checkKey](e);
+                handler.singleKeyFunctions[checkKey].action(e);
     }
 
     keyup(e, handler) {
         let key = e.key;
-        handler.keyPressed.splice(handler.keyPressed.map(k=>k.key).indexOf(key), 1);
+        handler.keyPressed.splice(handler.keyPressed.map(k => k.key).indexOf(key), 1);
     }
 
     isPressed(key) {
-        return this.keyPressed.map(k=>k.key).includes(key);
+        return this.keyPressed.map(k => k.key).includes(key);
     }
 }

@@ -1,6 +1,6 @@
 class Game {
     //TODO:
-    //Wall bug fixen dat hij daar even vast zit, hij is dan voorbij de plane van de muur denk ik
+    //Pocketen fixen is superlastig geworden
     constructor(player1, player2) {
         this.players = [player1, player2];
         this.cheatLine = false;
@@ -121,30 +121,6 @@ class Game {
             document.addEventListener('mousedown', function(e) {
                 MAIN.game.mousedown(e);
             }, false);
-            MAIN.keyHandler.setContinuousKey('ArrowLeft', function() {
-                let rotateSpeed = 3 / MAIN.loop.tps;
-                rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
-                rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-                MAIN.scene.cue.rotateY(rotateSpeed);
-            });
-            MAIN.keyHandler.setContinuousKey('ArrowRight', function() {
-                let rotateSpeed = 3 / MAIN.loop.tps;
-                rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
-                rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-                MAIN.scene.cue.rotateY(-rotateSpeed);
-            });
-            MAIN.keyHandler.setContinuousKey('ArrowUp', function() {
-                let powerSpeed = 10 / MAIN.loop.tps;
-                powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
-                powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-                MAIN.game.cuePower += powerSpeed;
-            });
-            MAIN.keyHandler.setContinuousKey('ArrowDown', function() {
-                let powerSpeed = 10 / MAIN.loop.tps;
-                powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
-                powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
-                MAIN.game.cuePower -= powerSpeed;
-            });
         }
     }
 
@@ -304,7 +280,7 @@ class Game {
     switchPlayers() {
         this.currentPlayer = (this.currentPlayer + 1) % 2;
         this.beurtElement.innerText = this.players[this.currentPlayer].name;
-        MAIN.msg('foul! ' + this.players[this.currentPlayer].name + "'s turn");
+        MAIN.msg('Foul! ' + this.players[this.currentPlayer].name + "'s turn");
     }
 
     saveImage(url, fileName) {

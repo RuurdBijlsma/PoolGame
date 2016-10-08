@@ -10,12 +10,8 @@ function newGame(n1, n2) {
         name2 = n2 || prompt('Player 2 name?', 'Player 2');
 
     let menu = document.getElementById('menu'),
-        gameHider = document.getElementById('gameHider');
     players = document.getElementById('players');
 
-    gameHider.style.opacity = 0;
-    gameHider.style.backgroundColor = 'transparent';
-    gameHider.style.pointerEvents = 'none';
     players.style.transform = 'scale(1) translateY(0px)';
     menu.style.width = '50%';
     menu.style.transform = 'translateX(-100%)';

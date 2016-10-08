@@ -25,10 +25,11 @@ html {
     font-family: 'Press Start 2P';
 }
 
-h1 {
+#interface h1 {
     margin: 0px;
     padding: 20px;
 }
+
 #beurt {
     position: fixed;
     top: 0px;
@@ -38,6 +39,7 @@ h1 {
     text-align: center;
     pointer-events: none;
 }
+
 #winner {
     z-index: 10;
     position: fixed;
@@ -47,7 +49,8 @@ h1 {
     height: 100%;
     pointer-events: none;
 }
-#imwinner{
+
+#imwinner {
     background-image: url(img/textures/yourewinner.png);
     background-size: contain;
     background-position: center;
@@ -55,8 +58,9 @@ h1 {
     width: 100%;
     height: 100%;
     transform: scale(0.3);
-    opacity:0;
+    opacity: 0;
 }
+
 #img {
     background-image: url(img/textures/yourewinner.png);
     background-size: contain;
@@ -65,30 +69,28 @@ h1 {
     width: 100%;
     height: 100%;
     transform: scale(0.8);
-    display:none;
+    display: none;
 }
-progress{
+
+progress {
     display: none;
     position: fixed;
-    bottom:0px;
-    left:0px;
-    width:100%;
-    height:20px;
-    background-color:red;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 20px;
+    background-color: red;
     transition: 0.3s;
 }
+
 progress[value] {
     /* Reset the default appearance */
     -webkit-appearance: none;
     appearance: none;
 }
-progress[value]::-webkit-progress-value {
-    background-image:
-            -webkit-linear-gradient(-45deg,
-            transparent 33%, rgba(0, 0, 0, .1) 33%,
-            rgba(0,0, 0, .1) 66%, transparent 66%),
-            -webkit-linear-gradient(left, #2fcc00, #f44);
 
+progress[value]::-webkit-progress-value {
+    background-image: -webkit-linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, .1) 33%, rgba(0, 0, 0, .1) 66%, transparent 66%), -webkit-linear-gradient(left, #2fcc00, #f44);
     border-radius: 2px;
     background-size: 35px 20px, 200% 100%, 100% 100%;
 }
@@ -146,24 +148,13 @@ progress[value]::-webkit-progress-value {
     height: 100%;
 }
 
-#gameHider {
-    transition: 0.4s;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: white;
-    transition-delay: 1s;
-    animation-name: hideIt;
-    animation-duration: 0.3s;
-    animation-delay: 1s;
-    animation-fill-mode: forwards;
-    animation-iteration-count: 1;
-}
 @keyframes hideIt {
-    0%   {opacity: 1;}
-    100% {opacity: 0.2;}
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.2;
+    }
 }
 
 #players {
@@ -194,12 +185,57 @@ progress[value]::-webkit-progress-value {
     background-size: 50%;
     background-position: center;
     background-repeat: no-repeat;
-    box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.1);
     display: none;
     transition: 0.3s;
 }
 
-#fullBalls,#stripeBalls {
+#help {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100% - 60px);
+    height: calc(100% - 60px);
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 20px;
+    padding: 30px;
+    overflow-y: auto;
+    display: none;
+}
+
+#help h1 {
+    margin-bottom: 20px;
+}
+
+li {
+    list-style: none;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+li:first-child{
+    border-top:1px solid rgba(0,0,0,0.1);
+}
+
+.key {
+    display: inline-block;
+    min-width: 20px;
+    height: 25px;
+    padding: 15px;
+    padding-bottom:20px;
+    padding-top:10px;
+    font-size:20px;
+    background-color: rgb(240, 240, 240);
+    text-align: center;
+    box-shadow: inset -5px 5px 2px rgba(0, 0, 0, 0.15), inset 5px -5px 2px rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+}
+
+.bindName {
+    display: inline-block;
+    transform: translateY(7px);
+}
+
+#fullBalls,
+#stripeBalls {
     width: calc(50% - 10px - 39px);
     display: inline-block;
     margin-right: -4px;

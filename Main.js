@@ -47,42 +47,100 @@ class Main {
     }
 
     setKeymap() {
-        let main = this;
-        this.keyHandler.setSingleKey(' ', function() {
+        let main = this,
+            helpElement = document.getElementById('help');
+        this.keyHandler.setSingleKey(' ', 'Shoot cue', function() {
             main.game.shoot();
         });
-        this.keyHandler.setSingleKey('5', function() {
+        this.keyHandler.setSingleKey('5', 'Top view', function() {
             main.scene.topView();
         });
-        this.keyHandler.setSingleKey('6', function() {
+        this.keyHandler.setSingleKey('6', 'East view', function() {
             main.scene.eastView();
         });
-        this.keyHandler.setSingleKey('4', function() {
+        this.keyHandler.setSingleKey('4', 'West view', function() {
             main.scene.westView();
         });
-        this.keyHandler.setSingleKey('2', function() {
+        this.keyHandler.setSingleKey('2', 'South view', function() {
             main.scene.southView();
         });
-        this.keyHandler.setSingleKey('8', function() {
+        this.keyHandler.setSingleKey('8', 'North view', function() {
             main.scene.northView();
         });
-        this.keyHandler.setSingleKey('s', function() {
+        this.keyHandler.setSingleKey('y', 'Toggle performance statistics', function() {
             main.scene.toggleStats();
         });
-        this.keyHandler.setSingleKey('o', function() {
+        this.keyHandler.setSingleKey('o', 'Pause all loops / play one frame (includes hold keys)', function() {
             clearInterval(MAIN.loop.gameloop);
             MAIN.loop.loop();
         });
-        this.keyHandler.setSingleKey('p', function() {
+        this.keyHandler.setSingleKey('p', 'Resume all loops', function() {
             MAIN.loop.start();
         });
-        this.keyHandler.setSingleKey('c', function() {
+        this.keyHandler.setSingleKey('c', 'Enable aim line', function() {
             main.scene.children = main.scene.children.filter((child) => child.type !== 'Line');
             main.game.cheatLine = !main.game.cheatLine;
         });
-        this.keyHandler.setSingleKey('w', function() {
+        this.keyHandler.setSingleKey('w', 'Place white ball freely', function() {
             main.game.freePlace(main.game.balls.filter((ball) => ball.number === 0)[0]);
         });
+        this.keyHandler.setSingleKey('s', 'Switch players', function() {
+            main.game.switchPlayers();
+        });
+        this.keyHandler.setSingleKey('/', 'Help key', function() {
+            if (this.display === 'block')
+                this.display = 'none';
+            else
+                this.display = 'block';
+            helpElement.style.display = this.display;
+        });
+        this.keyHandler.setContinuousKey('ArrowLeft', 'Rotate cue left', function() {
+            let rotateSpeed = 3 / MAIN.loop.tps;
+            rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
+            rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+            MAIN.scene.cue.rotateY(rotateSpeed);
+        });
+        this.keyHandler.setContinuousKey('ArrowRight', 'Rotate cue right', function() {
+            let rotateSpeed = 3 / MAIN.loop.tps;
+            rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;
+            rotateSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+            MAIN.scene.cue.rotateY(-rotateSpeed);
+        });
+        this.keyHandler.setContinuousKey('ArrowUp', 'Cue power up', function() {
+            let powerSpeed = 10 / MAIN.loop.tps;
+            powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
+            powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+            MAIN.game.cuePower += powerSpeed;
+        });
+        this.keyHandler.setContinuousKey('ArrowDown', 'Cue power down', function() {
+            let powerSpeed = 10 / MAIN.loop.tps;
+            powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
+            powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
+            MAIN.game.cuePower -= powerSpeed;
+        });
+
+        let keyMap = this.keyHandler.keyMap,
+            singleKeyElement = document.getElementById('single'),
+            continuousKeyElement = document.getElementById('continuous'),
+            singleHTML = '<ul>',
+            continuousHTML = '<ul>';
+
+        for (let key in keyMap.single)
+            singleHTML += `<li>
+                        <div class='key'>${key==' '?'Space':key}</div>
+                        <div class='bindName'>${keyMap.single[key].name}
+                    </li>`;
+        singleHTML += '</ul>';
+
+        for (let key in keyMap.continuous)
+            continuousHTML += `<li>
+                        <div class='key'>${key==' '?'Space':key}</div>
+                        <div class='bindName'>${keyMap.continuous[key].name}
+                    </li>`;
+        continuousHTML += '</ul>';
+
+        singleKeyElement.innerHTML = singleHTML;
+        continuousKeyElement.innerHTML = continuousHTML;
 
         document.addEventListener('keydown', function(e) {
             if (this.katKeys === undefined) {
