@@ -1,6 +1,6 @@
 class Game {
     //TODO:
-    //Pocketen fixen is superlastig geworden
+    //resolve collision mooi maken
     constructor(player1, player2) {
         this.players = [player1, player2];
         this.cheatLine = false;
@@ -32,6 +32,32 @@ class Game {
             new Ball(1.28, 6.4 + 2.75, 0.3075, true, 7, false),
             new Ball(-1.28, 6.4 + 2.75, 0.3075, true, 12, true)
         ];
+        this.pockets = {
+            1: {
+                position: new THREE.Vector3(6.75, this.balls[0].radius, 13.5),
+                radius: 0.8
+            },
+            2: {
+                position: new THREE.Vector3(-6.75, this.balls[0].radius, 13.5),
+                radius: 0.8
+            },
+            3: {
+                position: new THREE.Vector3(-7.2, this.balls[0].radius, 0),
+                radius: 0.6
+            },
+            4: {
+                position: new THREE.Vector3(-6.75, this.balls[0].radius, -13.5),
+                radius: 0.8
+            },
+            5: {
+                position: new THREE.Vector3(6.75, this.balls[0].radius, -13.5),
+                radius: 0.8
+            },
+            6: {
+                position: new THREE.Vector3(7.2, this.balls[0].radius, 0),
+                radius: 0.6
+            }
+        };
         this.maxPower = this.balls[0].radius * MAIN.loop.tps * 1.5;
 
         this.balls[0].stoppedRolling = this.whiteStop;
@@ -171,7 +197,7 @@ class Game {
                 ray = new THREE.Raycaster(MAIN.scene.cue.position);
             ray.ray.direction = direction;
             let intersectables = this.balls.slice();
-            intersectables.push(MAIN.scene.tableWallMesh);
+            intersectables.push(MAIN.scene.tableBase.mesh);
             let wallHits = ray.intersectObjects(intersectables);
             if (wallHits.length > 0) {
                 let lineGeometry = new THREE.Geometry();
@@ -209,10 +235,11 @@ class Game {
         let game = this;
         if (number === 0) {
             let ball = this.balls.find(b => b.number === number);
+            ball.pocketed = false;
             setTimeout(function() {
                 game.freePlace(ball);
                 game.switchPlayers();
-                MAIN.scene.animateScale(ball, { x: 1, y: 1, z: 1 }, 300);
+                MAIN.scene.animateScale(ball, { x: 1, y: 1, z: 1 }, 1000);
             }, 500);
         } else {
             setTimeout(function() {

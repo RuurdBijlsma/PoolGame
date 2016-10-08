@@ -47,8 +47,7 @@ class Main {
     }
 
     setKeymap() {
-        let main = this,
-            helpElement = document.getElementById('help');
+        let main = this;
         this.keyHandler.setSingleKey(' ', 'Shoot cue', function() {
             main.game.shoot();
         });
@@ -87,12 +86,8 @@ class Main {
         this.keyHandler.setSingleKey('s', 'Switch players', function() {
             main.game.switchPlayers();
         });
-        this.keyHandler.setSingleKey('/', 'Help key', function() {
-            if (this.display === 'block')
-                this.display = 'none';
-            else
-                this.display = 'block';
-            helpElement.style.display = this.display;
+        this.keyHandler.setSingleKey('/', 'Show/hide keymap', function() {
+            main.showKeyMap();
         });
         this.keyHandler.setContinuousKey('ArrowLeft', 'Rotate cue left', function() {
             let rotateSpeed = 3 / MAIN.loop.tps;
@@ -119,6 +114,23 @@ class Main {
             MAIN.game.cuePower -= powerSpeed;
         });
 
+        document.addEventListener('keydown', function(e) {
+            if (this.katKeys === undefined) {
+                this.katKeys = '';
+            }
+            this.katKeys += e.key;
+            if (this.katKeys.includes('kat.gif')) {
+                this.katKeys = '';
+                for (let ball of MAIN.game.balls) {
+                    ball.material = MAIN.katMaterial;
+                }
+                MAIN.scene.tableFloor.mesh.material = MAIN.katMaterial;
+                MAIN.katMaterial.toggle();
+            }
+        }, false);
+    }
+
+    showKeyMap() {
         let keyMap = this.keyHandler.keyMap,
             singleKeyElement = document.getElementById('single'),
             continuousKeyElement = document.getElementById('continuous'),
@@ -141,21 +153,12 @@ class Main {
 
         singleKeyElement.innerHTML = singleHTML;
         continuousKeyElement.innerHTML = continuousHTML;
-
-        document.addEventListener('keydown', function(e) {
-            if (this.katKeys === undefined) {
-                this.katKeys = '';
-            }
-            this.katKeys += e.key;
-            if (this.katKeys.includes('kat.gif')) {
-                this.katKeys = '';
-                for (let ball of MAIN.game.balls) {
-                    ball.material = MAIN.katMaterial;
-                }
-                MAIN.scene.tableFloor.mesh.material = MAIN.katMaterial;
-                MAIN.katMaterial.toggle();
-            }
-        }, false);
+        let helpElement = document.getElementById('help');
+        if (this.keyDisplay === 'block')
+            this.keyDisplay = 'none';
+        else
+            this.keyDisplay = 'block';
+        helpElement.style.display = this.keyDisplay;
     }
 
 

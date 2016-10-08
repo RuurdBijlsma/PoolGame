@@ -88,7 +88,7 @@ class Ball extends THREE.Mesh {
                 }
                 if (distance - this.radius < 0)
                     this.currentPosition.add(direction.clone().multiplyScalar(distance - this.radius));
-                
+
                 direction.reflect(direction).normalize(); //normaal
                 let speed = this.speed;
 
@@ -99,21 +99,12 @@ class Ball extends THREE.Mesh {
             }
 
             let scorePocket = false;
-            if (this.position.x > 6 && this.position.z > 13)
-                scorePocket = 1;
-            if (this.position.x < -6 && this.position.z > 13)
-                scorePocket = 2;
-
-            if (this.position.x < -7.1 && this.position.z < 1 && this.position.z > -1)
-                scorePocket = 3;
-
-            if (this.position.x < -6 && this.position.z < -13)
-                scorePocket = 4;
-            if (this.position.x > 6 && this.position.z < -13)
-                scorePocket = 5;
-
-            if (this.position.x > 7.1 && this.position.z < 1 && this.position.z > -1)
-                scorePocket = 6;
+            for (let pocket in MAIN.game.pockets) {
+                if (this.position.distanceTo(MAIN.game.pockets[pocket].position) < MAIN.game.pockets[pocket].radius) {
+                    scorePocket = pocket;
+                    break;
+                }
+            }
 
             if (scorePocket && !this.pocketed) {
                 this.pocketed = true;
@@ -132,7 +123,6 @@ class Ball extends THREE.Mesh {
                 MAIN.scene.animateScale(this, { x: 0.1, y: 0.1, z: 0.1 }, 500);
             }
 
-            this.prevPosition = this.position.clone();
             this.position.set(this.currentPosition.x, this.currentPosition.y, this.currentPosition.z);
             this.nextPosition = this.currentPosition.addVectors(this.speed, this.position);
         }
@@ -226,31 +216,31 @@ class Ball extends THREE.Mesh {
     }
     resolveCollision(ball) {
         this.playSound(ball);
-        let dx = this.nextPosition.x - ball.nextPosition.x,
-            dy = this.nextPosition.z - ball.nextPosition.z,
-            collisionAngle = Math.atan2(dy, dx),
-            speed1 = this.speed.length(),
-            speed2 = ball.speed.length(),
-            direction1 = Math.atan2(this.speed.z, this.speed.x),
-            direction2 = Math.atan2(ball.speed.z, ball.speed.x),
 
-            velocityx_1 = speed1 * Math.cos(direction1 - collisionAngle),
-            velocityy_1 = speed1 * Math.sin(direction1 - collisionAngle),
-            velocityx_2 = speed2 * Math.cos(direction2 - collisionAngle),
-            velocityy_2 = speed2 * Math.sin(direction2 - collisionAngle),
+        let delta = this.position.clone().sub(ball.position),
+            distance = delta.length();
+        distance -= this.radius + ball.radius;
+        if (distance < 0)
+            this.position.sub(delta.normalize().multiplyScalar(distance));
 
-            // velocity1 = ((this.mass - ball.mass) * velocity1 + 2 * ball.mass * velocity2) / this.mass + ball.mass,
-            // velocity2 = ((ball.mass - this.mass) * velocity2 + 2 * this.mass * velocity1) / this.mass + ball.mass,
+        let collisionAngle = Math.atan2(delta.x, delta.z),
+            thisSpeed = this.speed.length(),
+            ballSpeed = ball.speed.length(),
+            thisDirection = Math.atan2(this.speed.z, this.speed.x),
+            ballDirection = Math.atan2(ball.speed.z, ball.speed.x),
 
-            final_velocityx_1 = ((this.mass - ball.mass) * velocityx_1 + (ball.mass + ball.mass) * velocityx_2) / (this.mass + ball.mass),
-            final_velocityx_2 = ((this.mass + this.mass) * velocityx_1 + (ball.mass - this.mass) * velocityx_2) / (this.mass + ball.mass),
-            final_velocityy_1 = velocityy_1,
-            final_velocityy_2 = velocityy_2;
+            thisVelocity = new THREE.Vector3(thisSpeed * Math.cos(thisDirection - collisionAngle), 0,
+                thisSpeed * Math.sin(thisDirection - collisionAngle)),
+            ballVelocity = new THREE.Vector3(ballSpeed * Math.cos(ballDirection - collisionAngle), 0,
+                ballSpeed * Math.sin(ballDirection - collisionAngle)),
 
-        this.speed.x = Math.cos(collisionAngle) * final_velocityx_1 + Math.cos(collisionAngle + Math.PI / 2) * final_velocityy_1;
-        this.speed.z = Math.sin(collisionAngle) * final_velocityx_1 + Math.sin(collisionAngle + Math.PI / 2) * final_velocityy_1;
-        ball.speed.x = Math.cos(collisionAngle) * final_velocityx_2 + Math.cos(collisionAngle + Math.PI / 2) * final_velocityy_2;
-        ball.speed.z = Math.sin(collisionAngle) * final_velocityx_2 + Math.sin(collisionAngle + Math.PI / 2) * final_velocityy_2;
+            finalThisVelocity = new THREE.Vector3(((this.mass - ball.mass) * thisVelocity.x + (ball.mass + ball.mass) * ballVelocity.x) / (this.mass + ball.mass), 0, thisVelocity.z),
+            finalBallVelocity = new THREE.Vector3(((this.mass + this.mass) * thisVelocity.x + (ball.mass - this.mass) * ballVelocity.x) / (this.mass + ball.mass), 0, ballVelocity.z);
+
+        this.speed.x = Math.cos(collisionAngle) * finalThisVelocity.x + Math.cos(collisionAngle + Math.PI / 2) * finalThisVelocity.z;
+        this.speed.z = Math.sin(collisionAngle) * finalThisVelocity.x + Math.sin(collisionAngle + Math.PI / 2) * finalThisVelocity.z;
+        ball.speed.x = Math.cos(collisionAngle) * finalBallVelocity.x + Math.cos(collisionAngle + Math.PI / 2) * finalBallVelocity.z;
+        ball.speed.z = Math.sin(collisionAngle) * finalBallVelocity.x + Math.sin(collisionAngle + Math.PI / 2) * finalBallVelocity.z;
 
         this.speed.multiplyScalar(this.restitution.ball);
         ball.speed.multiplyScalar(ball.restitution.ball);

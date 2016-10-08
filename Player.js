@@ -55,7 +55,7 @@ class Player {
         MAIN.game.getWinnerImage(this.name).then(function(url) {
             winnerElement.style.backgroundImage = 'url(' + url + ')';
 
-            MAIN.keyHandler.setSingleKey('p', function() {
+            MAIN.keyHandler.setSingleKey('p', 'Print your trophy and save it as a png file', function() {
                 window.open(url).print();
                 MAIN.game.saveImage(url, player.name);
             });

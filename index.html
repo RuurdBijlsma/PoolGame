@@ -73,13 +73,14 @@
         <div id="menu">
             <h1>Online Pool</h1>
             <div class="menuItem" onclick="newGame()">New Game</div>
-            <div class="menuItem">Options</div>
+            <div class="menuItem" onclick='MAIN.showKeyMap()'>Keymap</div>
         </div>
         <progress value="800" max="1000">
         </progress>
     </div>
     <div id='help'>
         <h1>Keybinds:</h1>
+        <div id='closeKeymap' onclick='MAIN.showKeyMap()'>✕</div>
         <div id='keybinds'>
             <div id='single'></div>
             <div id='continuous'></div>

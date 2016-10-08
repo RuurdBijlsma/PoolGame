@@ -19,13 +19,13 @@ class KeyHandler {
         this.continuousKeyFunctions = {};
     }
 
-    get keyMap(){
+    get keyMap() {
         let map = {};
         map.continuous = {};
-        for(let key in this.continuousKeyFunctions)
+        for (let key in this.continuousKeyFunctions)
             map.continuous[key] = this.continuousKeyFunctions[key];
         map.single = {};
-        for(let key in this.singleKeyFunctions)
+        for (let key in this.singleKeyFunctions)
             map.single[key] = this.singleKeyFunctions[key];
         return map;
     }

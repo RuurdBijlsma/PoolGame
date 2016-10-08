@@ -202,7 +202,23 @@ progress[value]::-webkit-progress-value {
     overflow-y: auto;
     display: none;
 }
-
+#closeKeymap {
+    width: 20;
+    height: 20;
+    position: absolute;
+    top: 0px;
+    text-align: center;
+    right: 0px;
+    background-color: rgba(0,0,0,0.1);
+    padding: 25px;
+    padding-top: 15px;
+    cursor: pointer;
+    transition:0.1s;
+}
+#closeKeymap:hover{
+    color:white;
+    background-color:maroon;
+}
 #help h1 {
     margin-bottom: 20px;
 }
