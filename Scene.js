@@ -37,7 +37,7 @@ class Scene extends THREE.Scene {
         }
 
         this.stats = new Stats();
-        this.stats.showPanel();
+        this.stats.showPanel(0);
         document.body.appendChild(this.stats.dom);
 
         if (main.isMobile) {
