@@ -66,6 +66,7 @@ class Game {
                 MAIN.game.orientation(e);
             }, false);
             document.addEventListener('touchstart', function(e) {
+                e.preventDefault();
                 MAIN.game.tapLength = 0;
                 MAIN.game.tapStart = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
             }, false);
@@ -89,6 +90,7 @@ class Game {
                 }
             }, true);
             document.addEventListener('touchend', function(e) {
+                e.preventDefault();
                 if (MAIN.game.placeLoop) {
                     MAIN.game.shootingEnabled = true;
                     MAIN.game.placeLoop = MAIN.loop.remove(MAIN.game.placeLoop);
