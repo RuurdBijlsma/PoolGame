@@ -6,6 +6,7 @@ class GameLoop {
         };
         this.amount = 1;
         this.start();
+        this.time = performance.now();
     }
     add(fun) {
         this.functions[this.amount] = fun;

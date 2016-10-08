@@ -276,6 +276,7 @@ class Game {
                         speed = new THREE.Vector3(z, 0, x).multiplyScalar(power);
 
                     that.selectedBall.setSpeed(speed);
+                    //timeGameLoop();
 
                     that.hitSound.play(power / 0.3075)
 

@@ -37,7 +37,7 @@ class Scene extends THREE.Scene {
         }
 
         this.stats = new Stats();
-        this.stats.showPanel(0);
+        this.stats.showPanel();
         document.body.appendChild(this.stats.dom);
 
         if (main.isMobile) {
@@ -66,7 +66,8 @@ class Scene extends THREE.Scene {
             ambient: new AmbientLight(this, 0xffffdd, 0.1)
         };
 
-        this.skyBox = new SkyBox(this, 'img/skybox/clouds/');
+        if(!main.isMobile)
+            this.skyBox = new SkyBox(this, 'img/skybox/clouds/');
 
         let clothMap = this.textureLoader.load('img/textures/cloth©.jpg'),
             clothMaterial = new THREE.MeshStandardMaterial(

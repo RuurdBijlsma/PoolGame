@@ -8,6 +8,14 @@ function init() {
         newGame(users[0], users[1]);
 }
 
+function timeGameLoop() {
+    clearInterval(MAIN.loop.gameloop);
+    time(function(){
+        MAIN.loop.loop();
+    }, 100);
+    MAIN.loop.start();
+}
+
 function newGame(n1, n2) {
     do{
         var name1 = n1 || prompt('Player 1 name?', 'Player 1'),
