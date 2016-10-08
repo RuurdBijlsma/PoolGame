@@ -106,13 +106,13 @@ class Main {
             MAIN.scene.cue.rotateY(-rotateSpeed);
         });
         this.keyHandler.setContinuousKey('ArrowUp', 'Cue power up', function() {
-            let powerSpeed = 10 / MAIN.loop.tps;
+            let powerSpeed = 20 / MAIN.loop.tps;
             powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
             powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
             MAIN.game.cuePower += powerSpeed;
         });
         this.keyHandler.setContinuousKey('ArrowDown', 'Cue power down', function() {
-            let powerSpeed = 10 / MAIN.loop.tps;
+            let powerSpeed = 20 / MAIN.loop.tps;
             powerSpeed /= MAIN.keyHandler.isPressed('Shift') ? 5 : 1;
             powerSpeed /= MAIN.keyHandler.isPressed('Control') ? 5 : 1;
             MAIN.game.cuePower -= powerSpeed;
