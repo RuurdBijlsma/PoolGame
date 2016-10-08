@@ -46,7 +46,7 @@ class Game {
         this.highlightedBall = null;
         this.selectedBall = this.balls[0];
 
-        this.cuePower = this.maxPower / 1.5;
+        this.cuePower = this.maxPower;
 
         this.beurtElement = document.getElementById("beurt");
         this.players = [new Player(player1, 1), new Player(player2, 0)];
@@ -75,9 +75,12 @@ class Game {
                 MAIN.game.mousePos.x = (tap.x / window.innerWidth) * 2 - 1;
                 MAIN.game.mousePos.y = -(tap.y / window.innerHeight) * 2 + 1;
 
-                if (MAIN.game.tapLength > 10 && !MAIN.game.placeLoop) {
-                    let horizontalLength = tap.x / window.innerWidth;
-                    MAIN.game.cuePower = horizontalLength * MAIN.game.maxPower;
+                if (MAIN.game.tapLength > 50 && !MAIN.game.placeLoop) {
+                    if (tap.x - MAIN.game.tapStart.x > 50) {
+                        MAIN.game.tapStart.x = -200;
+                        let horizontalLength = tap.x / window.innerWidth;
+                        MAIN.game.cuePower = horizontalLength * MAIN.game.maxPower;
+                    }
                 } else {
                     MAIN.game.tapLength = tap.distanceTo(MAIN.game.tapStart);
                 }
@@ -87,8 +90,14 @@ class Game {
                     if (this.placeLoop) {
                         this.shootingEnabled = true;
                         this.placeLoop = MAIN.loop.remove(this.placeLoop);
-                    }else{
+                    } else {
                         MAIN.game.shoot();
+                    }
+                } else {
+                    let verticalLength = (MAIN.game.mousePos.y - MAIN.game.tapStart.y) / window.innerHeight;
+                    if (verticalLength < -0.5) {
+                        MAIN.scene.children = MAIN.scene.children.filter((child) => child.type !== 'Line');
+                        MAIN.game.cheatLine = !MAIN.game.cheatLine;
                     }
                 }
             }, false);
