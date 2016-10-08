@@ -137,7 +137,7 @@ class Game {
     }
 
     orientation(e) {
-        let rotation = THREE.Math.degToRad(e.alpha + 90);
+        let rotation = THREE.Math.degToRad(e.alpha - 180);
 
         let quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotation + Math.PI);
         MAIN.scene.cue.setRotationFromQuaternion(quaternion);
