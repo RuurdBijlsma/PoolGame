@@ -66,12 +66,10 @@ class Game {
                 MAIN.game.orientation(e);
             }, false);
             document.addEventListener('touchstart', function(e) {
-                e.preventDefault();
                 MAIN.game.tapLength = 0;
                 MAIN.game.tapStart = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
             }, false);
             document.addEventListener('touchmove', function(e) {
-                e.preventDefault();
                 let tap = new THREE.Vector2(e.touches[0].pageX, e.touches[0].pageY);
 
                 MAIN.game.mousePos.x = (tap.x / window.innerWidth) * 2 - 1;
@@ -90,27 +88,28 @@ class Game {
                 }
             }, true);
             document.addEventListener('touchend', function(e) {
-                e.preventDefault();
                 if (MAIN.game.placeLoop) {
                     MAIN.game.shootingEnabled = true;
                     MAIN.game.placeLoop = MAIN.loop.remove(MAIN.game.placeLoop);
                     MAIN.game.selectedBall.stoppedRolling();
                 } else {
-                    if (MAIN.game.tapLength < 10) {
-                        if (this.placeLoop) {
-                            this.shootingEnabled = true;
-                            this.placeLoop = MAIN.loop.remove(this.placeLoop);
-                        } else {
-                            MAIN.game.shoot();
-                        }
+                    if (e.touches[3]) {
+                        MAIN.game.fixedRotation = !MAIN.game.fixedRotation;
+                        MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, Math.PI);
                     } else {
-                        let verticalLength = (MAIN.game.tapPos.y - MAIN.game.tapStart.y) / window.innerHeight;
-                        if (verticalLength < -0.5) {
-                            MAIN.scene.children = MAIN.scene.children.filter((child) => child.type !== 'Line');
-                            MAIN.game.cheatLine = !MAIN.game.cheatLine;
-                        } else if (verticalLength > 0.5) {
-                            MAIN.game.fixedRotation = !MAIN.game.fixedRotation;
-                            MAIN.scene.camera.rotation.set(MAIN.scene.camera.rotation._x, MAIN.scene.camera.rotation._y, Math.PI);
+                        if (MAIN.game.tapLength < 10) {
+                            if (this.placeLoop) {
+                                this.shootingEnabled = true;
+                                this.placeLoop = MAIN.loop.remove(this.placeLoop);
+                            } else {
+                                MAIN.game.shoot();
+                            }
+                        } else {
+                            let verticalLength = (MAIN.game.tapPos.y - MAIN.game.tapStart.y) / window.innerHeight;
+                            if (verticalLength < -0.5) {
+                                MAIN.scene.children = MAIN.scene.children.filter((child) => child.type !== 'Line');
+                                MAIN.game.cheatLine = !MAIN.game.cheatLine;
+                            }
                         }
                     }
                 }
