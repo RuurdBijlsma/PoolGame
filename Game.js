@@ -1,6 +1,4 @@
 class Game {
-    //TODO:
-    //resolve collision mooi maken
     constructor(player1, player2) {
         this.players = [player1, player2];
         this.cheatLine = false;

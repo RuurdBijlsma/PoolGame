@@ -89,6 +89,10 @@ class Main {
         this.keyHandler.setSingleKey('/', 'Show/hide keymap', function() {
             main.showKeyMap();
         });
+        this.keyHandler.setSingleKey('n', 'Start new game', function() {
+            location.hash = main.game.players[0].name + '//' + main.game.players[1].name;
+            location.reload();
+        });
         this.keyHandler.setContinuousKey('ArrowLeft', 'Rotate cue left', function() {
             let rotateSpeed = 3 / MAIN.loop.tps;
             rotateSpeed /= MAIN.keyHandler.isPressed('Shift') ? 10 : 1;

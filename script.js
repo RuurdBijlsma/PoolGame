@@ -2,15 +2,23 @@ document.addEventListener('DOMContentLoaded', init, false);
 
 function init() {
     MAIN = new Main(document.getElementById('renderView'));
-    //newGame('Rurd','Bijlsma');
+
+    let users = location.hash.substr(1).split('//');
+    if (users.length === 2)
+        newGame(users[0], users[1]);
 }
 
 function newGame(n1, n2) {
-    let name1 = n1 || prompt('Player 1 name?', 'Player 1'),
-        name2 = n2 || prompt('Player 2 name?', 'Player 2');
+    do{
+        var name1 = n1 || prompt('Player 1 name?', 'Player 1'),
+            name2 = n2 || prompt('Player 2 name?', 'Player 2');
+    }while(name1.includes('//') || name2.includes('//'));
+
+    name1 = name1.substr(0, 1).toUpperCase() + name1.substr(1);
+    name2 = name2.substr(0, 1).toUpperCase() + name2.substr(1);
 
     let menu = document.getElementById('menu'),
-    players = document.getElementById('players');
+        players = document.getElementById('players');
 
     players.style.transform = 'scale(1) translateY(0px)';
     menu.style.width = '50%';
@@ -18,7 +26,7 @@ function newGame(n1, n2) {
     menu.style.pointerEvents = 'none';
     menu.style.opacity = 0;
 
-    setTimeout(function(){
+    setTimeout(function() {
         MAIN.startGame(name1, name2);
     }, 300);
 }
