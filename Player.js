@@ -13,8 +13,7 @@ class Player {
             this.getOpponent().win('The black ball has been illegally pocketed');
         } else if (pocket === this.eightBallPocket && number == 8 && this.remainingBalls.length === 0) {
             console.log('2', number, this.remainingBalls, pocket, this.eightBallPocket);
-            this.getOpponent().win('Every ball has been legaly pocketed');
-            this.win();
+            this.win('Every ball has been legaly pocketed');
         }
         if (!this.side) {
             for (let side in Game.balls)
@@ -42,6 +41,23 @@ class Player {
         this.getOpponent().remainingBalls = this.getOpponent().remainingBalls.filter((ballNumber) => ballNumber !== number);
 
         this.eightBallPocket = (pocket + 3) % 6;
+        console.log(pocket, this.eightBallPocket);
+        if (this.remainingBalls.length === 0 && !this.eightBallColor)
+            this.setEightballColor(this, this.getOpponent());
+        if (this.getOpponent().remainingBalls.length === 0 && !this.getOpponent().eightBallColor)
+            this.setEightballColor(this.getOpponent(), this);
+    }
+
+    setEightballColor(player, opponent) {
+        if (opponent.eightBallPocket === player.eightBallPocket && opponent.eightBallColor) //zelfde eightball pocket voor beide spelers, en beide spelers hebben geen ballen over
+            player.eightBallColor = opponent.eightBallColor;
+        else if (!player.eightBallColor)
+            player.eightBallColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6);
+
+        document.getElementById(player.side + 'Balls').style.color = player.eightBallColor;
+        console.log(player.eightBallPocket);
+        MAIN.game.pockets[player.eightBallPocket].mesh.visible = true;
+        MAIN.game.pockets[player.eightBallPocket].mesh.material.color = new THREE.Color(player.eightBallColor);
     }
 
     win(reason = '') {

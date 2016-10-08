@@ -101,14 +101,14 @@ class Ball extends THREE.Mesh {
             let scorePocket = false;
             for (let pocket in MAIN.game.pockets) {
                 if (this.position.distanceTo(MAIN.game.pockets[pocket].position) < MAIN.game.pockets[pocket].radius) {
-                    scorePocket = pocket;
+                    scorePocket = parseInt(pocket);
                     break;
                 }
             }
 
             if (scorePocket && !this.pocketed) {
                 this.pocketed = true;
-                console.log('pocketed ', this.number);
+                console.log('pocketed ', this.number, 'pocket: ' + scorePocket);
                 MAIN.game.hitSound.play(0.2);
                 setTimeout(() => MAIN.game.hitSound.play(0.4), 300);
                 setTimeout(() => MAIN.game.hitSound.play(0.3), 500);

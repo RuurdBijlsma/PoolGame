@@ -31,31 +31,39 @@ class Game {
             new Ball(-1.28, 6.4 + 2.75, 0.3075, true, 12, true)
         ];
         this.pockets = {
-            1: {
+            0: {
                 position: new THREE.Vector3(6.75, this.balls[0].radius, 13.5),
                 radius: 0.8
             },
-            2: {
+            1: {
                 position: new THREE.Vector3(-6.75, this.balls[0].radius, 13.5),
                 radius: 0.8
             },
-            3: {
+            2: {
                 position: new THREE.Vector3(-7.2, this.balls[0].radius, 0),
                 radius: 0.6
             },
-            4: {
+            3: {
                 position: new THREE.Vector3(-6.75, this.balls[0].radius, -13.5),
                 radius: 0.8
             },
-            5: {
+            4: {
                 position: new THREE.Vector3(6.75, this.balls[0].radius, -13.5),
                 radius: 0.8
             },
-            6: {
+            5: {
                 position: new THREE.Vector3(7.2, this.balls[0].radius, 0),
                 radius: 0.6
             }
         };
+
+        for (let pocket in this.pockets) { //meshes om te laten zien waar de eightball in moet
+            this.pockets[pocket].mesh = new THREE.Mesh(new THREE.CylinderGeometry(this.pockets[pocket].radius, this.pockets[pocket].radius, 0.1, 32), new THREE.MeshStandardMaterial({ color: 0xffff00 }));
+            this.pockets[pocket].mesh.position.set(this.pockets[pocket].position.x, -0.1, this.pockets[pocket].position.z);
+            MAIN.scene.add(this.pockets[pocket].mesh);
+            this.pockets[pocket].mesh.visible = false;
+        }
+
         this.maxPower = this.balls[0].radius * MAIN.loop.tps * 1.5;
 
         this.balls[0].stoppedRolling = this.whiteStop;

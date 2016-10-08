@@ -66,7 +66,7 @@ class Scene extends THREE.Scene {
             ambient: new AmbientLight(this, 0xffffdd, 0.1)
         };
 
-        if(!main.isMobile)
+        if (!main.isMobile)
             this.skyBox = new SkyBox(this, 'img/skybox/clouds/');
 
         let clothMap = this.textureLoader.load('img/textures/cloth©.jpg'),
@@ -166,34 +166,6 @@ class Scene extends THREE.Scene {
         this.floorMesh.position.y = -7.788 - 50;
         this.floorMesh.receiveShadow = true;
         this.add(this.floorMesh);
-
-        // let radius = 0.8,
-        //     cylinderGeometry = new THREE.CylinderGeometry(radius, radius, 2, 32),
-        //     cylinderMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00 });
-
-        // this.cylinder1 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-        // this.cylinder2 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-        // this.cylinder4 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-        // this.cylinder5 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-        // this.cylinder1.position.set(-6.75, 0, 13.5);
-        // this.cylinder2.position.set(6.75, 0, 13.5);
-        // this.cylinder4.position.set(-6.75, 0, -13.5);
-        // this.cylinder5.position.set(6.75, 0, -13.5);
-
-        // radius = 0.6;
-        // cylinderGeometry = new THREE.CylinderGeometry(radius, radius, 2, 32);
-        
-        // this.cylinder3 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-        // this.cylinder6 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-        // this.cylinder3.position.set(-7.2, 0, 0);
-        // this.cylinder6.position.set(7.2, 0, 0);
-
-        // this.add(this.cylinder1);
-        // this.add(this.cylinder2);
-        // this.add(this.cylinder3);
-        // this.add(this.cylinder4);
-        // this.add(this.cylinder5);
-        // this.add(this.cylinder6);
 
         this.render();
     }
