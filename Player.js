@@ -75,6 +75,10 @@ class Player {
                 window.open(url).print();
                 MAIN.game.saveImage(url, player.name);
             });
+            MAIN.keyHandler.setSingleKey('Enter', 'Hide winner image', function() {
+                winnerElement.style.display = 'none';
+                MAIN.scene.trophyView();
+            });
         });
     }
 }

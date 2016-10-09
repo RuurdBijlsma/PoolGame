@@ -131,6 +131,8 @@ class Scene extends THREE.Scene {
         this.tableBase = new ObjMesh(this, 'obj/table/woodwalls.obj', 'img/textures/wood©.jpg', 30, true, this.laptopGraphics, !this.laptopGraphics);
         this.tableLegs = new ObjMesh(this, 'obj/table/legs.obj', 'img/textures/wood©.jpg', 10, !this.laptopGraphics, true, !this.laptopGraphics);
 
+        this.trophy = new ObjMesh(this, 'obj/trophy.obj', 'img/textures/gold.jpg', 10, !this.laptopGraphics, false, !this.laptopGraphics, 0.02, false);
+
         let keuGeometry = new THREE.CylinderGeometry(0.06, 0.1, 15, 32, 32),
             keuMaterial = new THREE.MeshStandardMaterial({ color: 0xfda43a }),
             keuMesh = new THREE.Mesh(keuGeometry, keuMaterial);
@@ -145,6 +147,7 @@ class Scene extends THREE.Scene {
         this.cue.position.set(0, 0.3075, -6.75);
 
         let randomStartRotation = 0.07;
+        //randomStartRotation = 0;
         this.cue.rotateY(randomStartRotation / 2 - Math.random() * randomStartRotation);
 
         this.add(this.cue);
@@ -180,20 +183,55 @@ class Scene extends THREE.Scene {
         }
     }
 
+    cancelTrophyView(){
+        if(this.trophyTimeout)
+            clearTimeout(this.trophyTimeout);
+        if(this.trophyInterval)
+            clearInterval(this.trophyInterval);
+        if(this.trophyScaleTween)
+            this.trophyScaleTween.stop();
+        if(this.cameraTrophyTween)
+            this.cameraTrophyTween.stop();
+        if(this.trophy.mesh){
+            this.trophy.mesh.visible = false;
+            this.trophy.mesh.scale.set(0, 0, 0);
+        }
+    }
     topView() {
+        this.cancelTrophyView();
         this.animateObject(this.camera, new THREE.Vector3(.01, 25, 0), 300, new THREE.Vector3);
     }
     westView() {
+        this.cancelTrophyView();
         this.animateObject(this.camera, new THREE.Vector3(15, 15, 0), 300, new THREE.Vector3);
     }
     eastView() {
+        this.cancelTrophyView();
         this.animateObject(this.camera, new THREE.Vector3(-15, 15, 0), 300, new THREE.Vector3);
     }
     northView() {
+        this.cancelTrophyView();
         this.animateObject(this.camera, new THREE.Vector3(0, 15, 25), 300, new THREE.Vector3);
     }
     southView() {
+        this.cancelTrophyView();
         this.animateObject(this.camera, new THREE.Vector3(0, 15, -25), 300, new THREE.Vector3);
+    }
+    trophyView() {
+        this.trophy.mesh.visible = true;
+        this.trophy.mesh.scale.set(0, 0, 0);
+        this.cameraTrophyTween = this.animateScale(MAIN.scene.trophy.mesh, { x: 1, y: 1, z: 1 }, 3000);
+        this.trophyScaleTween = this.animateObject(this.camera, new THREE.Vector3(10, 5, 0), 3000, new THREE.Vector3(0, 3, 0));
+        let scene = this;
+        this.trophyTimeout = setTimeout(function() {
+            let rotation = Math.PI / 2;
+            scene.trophyInterval = setInterval(function() {
+                MAIN.scene.camera.position.x = Math.sin(rotation) * 10;
+                MAIN.scene.camera.position.z = Math.cos(rotation) * 10;
+                rotation += 0.005;
+                MAIN.scene.camera.lookAt(new THREE.Vector3(0, 3, 0)); // the origin
+            }, 10);
+        }, 3000);
     }
 
     animateObject(object, newPos, time = 1000, target = null, easing = TWEEN.Easing.Quartic.InOut) {
