@@ -11,6 +11,8 @@ class SpotLight extends THREE.SpotLight {
             this.castShadow = true;
             this.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(80, 1, 1, 2500));
             this.shadow.bias = 0.0005;
+            this.shadow.mapSize.height = 1024;
+            this.shadow.mapSize.width = 1024;
         }
 
         this.target = target;
@@ -28,6 +30,8 @@ class DirectionalLight extends THREE.DirectionalLight {
             this.castShadow = true;
             this.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(80, 1, 1, 2500));
             this.shadow.bias = 0.0005;
+            this.shadow.mapSize.height = 1024;
+            this.shadow.mapSize.width = 1024;
         }
 
         this.position.set(x, y, z);
