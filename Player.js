@@ -33,18 +33,20 @@ class Player {
             if (this.hasFoul === undefined) {
                 this.hasFoul = false;
             }
+            this.eightBallPocket = (pocket + 3) % 6;
         } else {
+            this.getOpponent().eightBallPocket = (pocket + 3) % 6;
             this.hasFoul = true;
         }
         document.getElementsByClassName('b' + number)[0].style.display = 'none';
         this.remainingBalls = this.remainingBalls.filter((ballNumber) => ballNumber !== number);
         this.getOpponent().remainingBalls = this.getOpponent().remainingBalls.filter((ballNumber) => ballNumber !== number);
 
-        this.eightBallPocket = (pocket + 3) % 6;
+
         console.log(pocket, this.eightBallPocket);
         if (this.remainingBalls.length === 0 && !this.eightBallColor)
             this.setEightballColor(this, this.getOpponent());
-        if (this.getOpponent().remainingBalls.length === 0 && !this.getOpponent().eightBallColor)
+        if (this.getOpponent().remainingBalls.length === 0 && !this.getOpponent().eightBallColor && this.getOpponent().eightBallPocket !== -1)
             this.setEightballColor(this.getOpponent(), this);
     }
 

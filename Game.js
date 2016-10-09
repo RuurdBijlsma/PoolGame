@@ -3,6 +3,7 @@ class Game {
         this.players = [player1, player2];
         this.cheatLine = false;
         this.shootingEnabled = true;
+        this.movingBalls = 0;
 
         this.hitSound = new FrequencySound('sound/hit.mp3');
         this.pocketSound = new VolumeSound('sound/pocket.mp3');
@@ -66,7 +67,8 @@ class Game {
 
         this.maxPower = this.balls[0].radius * MAIN.loop.tps * 1.5;
 
-        this.balls[0].stoppedRolling = this.whiteStop;
+        for(let ball of this.balls)
+            ball.stoppedRolling = this.whiteStop;
         MAIN.scene.lights.spot.target = this.balls[0];
         let ballPos = this.balls[0].position;
         MAIN.scene.cue.position.set(ballPos.x, ballPos.y, ballPos.z);
@@ -250,7 +252,7 @@ class Game {
         } else {
             setTimeout(function() {
                 MAIN.scene.remove(game.balls.find(b => b.number === number));
-                game.balls = game.balls.filter(b => b !== number);
+                game.balls = game.balls.filter(b => b.number !== number);
             }, 500);
             this.players[this.currentPlayer].addPoint(number, pocket, stripe ? 'stripe' : 'full');
         }
@@ -300,7 +302,7 @@ class Game {
 
     whiteStop() {
         MAIN.game.shootingEnabled = true;
-        MAIN.scene.animateObject(MAIN.scene.cue, this.position, 1000);
+        MAIN.scene.animateObject(MAIN.scene.cue, MAIN.game.selectedBall.position, 1000);
         //check fouls
         let foul = MAIN.game.players[MAIN.game.currentPlayer].hasFoul;
         if (foul === true || foul === undefined)
@@ -365,6 +367,7 @@ class Game {
     }
 
     linePlace(ball, line = -6.75) {
+        this.movingBalls--;
         let that = this;
         this.placeLoop = MAIN.loop.add(function() {
             that.raycaster.setFromCamera(that.mousePos, MAIN.scene.camera);
@@ -381,6 +384,7 @@ class Game {
     }
 
     freePlace(ball) {
+        this.movingBalls--;
         ball.speed.set(0, 0, 0);
         ball.ballLoop = MAIN.loop.remove(ball.ballLoop);
         let that = this;

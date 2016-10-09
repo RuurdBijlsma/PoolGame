@@ -46,6 +46,7 @@ class Ball extends THREE.Mesh {
         this.speed = speed;
         this.nextPosition = this.position.clone().addVectors(this.speed, this.position);
         if (!this.ballLoop) {
+            MAIN.game.movingBalls++;
             this.ballLoop = MAIN.loop.add(function() {
                 ball.moveBall();
             });
@@ -56,7 +57,9 @@ class Ball extends THREE.Mesh {
         let stopThreshold = 0.001;
         if (this.speed.length() < stopThreshold) {
             this.speed.set(0, 0, 0);
-            this.stoppedRolling();
+            MAIN.game.movingBalls--;
+            if(MAIN.game.movingBalls===0)
+                this.stoppedRolling();
             this.ballLoop = MAIN.loop.remove(this.ballLoop);
         } else {
             let circumference = this.radius,
