@@ -109,9 +109,8 @@ class Ball extends THREE.Mesh {
                 }
             }
 
-            if (scorePocket && !this.pocketed) {
+            if (scorePocket) {
                 MAIN.game.movingBalls--;
-                this.pocketed = true;
                 console.log('pocketed ', this.number, 'pocket: ' + scorePocket);
                 MAIN.game.hitSound.play(0.2);
                 setTimeout(() => MAIN.game.hitSound.play(0.4), 300);

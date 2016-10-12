@@ -367,7 +367,6 @@ class Game {
     }
 
     linePlace(ball, line = -6.75) {
-        this.movingBalls--;
         let that = this;
         this.placeLoop = MAIN.loop.add(function() {
             that.raycaster.setFromCamera(that.mousePos, MAIN.scene.camera);
@@ -384,7 +383,6 @@ class Game {
     }
 
     freePlace(ball) {
-        this.movingBalls--;
         ball.speed.set(0, 0, 0);
         ball.ballLoop = MAIN.loop.remove(ball.ballLoop);
         let that = this;
